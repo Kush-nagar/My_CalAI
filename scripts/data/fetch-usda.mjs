@@ -2,7 +2,7 @@
 // extract used to curate the bundled seed. Runs in GitHub Actions (cloud dev container cannot
 // reach fdc.nal.usda.gov). Usage: node scripts/data/fetch-usda.mjs <workdir> <out.json.gz>
 import { execFileSync } from 'node:child_process';
-import { createReadStream, mkdirSync, readdirSync, writeFileSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, readdirSync, writeFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
 import { gzipSync } from 'node:zlib';
@@ -17,6 +17,12 @@ const NUTRIENTS = {
   1093: 'sodium_mg', 1092: 'potassium_mg', 1087: 'calcium_mg', 1089: 'iron_mg', 1095: 'zinc_mg',
   1162: 'vitc_mg', 1190: 'folate_ug', 1178: 'vitb12_ug',
 };
+
+// Auxiliary CSVs differ per dataset (e.g. FNDDS has no food_category.csv): skip when absent.
+async function optRows(file, onRow) {
+  if (!existsSync(file)) { console.log('  (absent, skipped)', file.split('/').pop()); return; }
+  await csvRows(file, onRow);
+}
 
 async function csvRows(file, onRow) {
   const rl = createInterface({ input: createReadStream(file), crlfDelay: Infinity });
@@ -64,24 +70,22 @@ for (const [kind, re] of Object.entries(KINDS)) {
   datasets.push({ kind, file: zipName, url });
 
   const units = new Map();
-  await csvRows(join(csv, 'measure_unit.csv'), (r) => units.set(r.id, r.name));
+  await optRows(join(csv, 'measure_unit.csv'), (r) => units.set(r.id, r.name));
   const cats = new Map();
-  await csvRows(join(csv, 'food_category.csv'), (r) => cats.set(r.id, r.description));
+  await optRows(join(csv, 'food_category.csv'), (r) => cats.set(r.id, r.description));
   const wweia = new Map();
-  try { await csvRows(join(csv, 'wweia_food_category.csv'), (r) => wweia.set(r.wweia_food_category, r.wweia_food_category_description)); } catch {}
+  await optRows(join(csv, 'wweia_food_category.csv'), (r) => wweia.set(r.wweia_food_category, r.wweia_food_category_description));
   const local = new Map();
   await csvRows(join(csv, 'food.csv'), (r) => {
     if (!['sr_legacy_food', 'survey_fndds_food', 'foundation_food'].includes(r.data_type)) return;
     local.set(r.fdc_id, { fdcId: Number(r.fdc_id), dataset: kind, dataType: r.data_type, desc: r.description, cat: cats.get(r.food_category_id) ?? null, published: r.publication_date, n: {}, portions: [] });
   });
-  try {
-    await csvRows(join(csv, 'survey_fndds_food.csv'), (r) => { const f = local.get(r.fdc_id); if (f) { f.foodCode = r.food_code; f.cat = wweia.get(r.wweia_category_number) ?? f.cat; } });
-  } catch {}
+  await optRows(join(csv, 'survey_fndds_food.csv'), (r) => { const f = local.get(r.fdc_id); if (f) { f.foodCode = r.food_code; f.cat = wweia.get(r.wweia_category_number ?? r.wweia_category_code) ?? f.cat; } });
   await csvRows(join(csv, 'food_nutrient.csv'), (r) => {
     const f = local.get(r.fdc_id); const code = NUTRIENTS[r.nutrient_id];
     if (f && code && r.amount !== '') f.n[code] = Number(r.amount);
   });
-  await csvRows(join(csv, 'food_portion.csv'), (r) => {
+  await optRows(join(csv, 'food_portion.csv'), (r) => {
     const f = local.get(r.fdc_id); if (!f || !(Number(r.gram_weight) > 0)) return;
     const unit = units.get(r.measure_unit_id);
     const label = [r.amount && r.amount !== '' ? r.amount : '', unit && unit !== 'undetermined' ? unit : '', r.portion_description, r.modifier].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
