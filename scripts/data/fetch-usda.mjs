@@ -53,7 +53,22 @@ function findCsvDir(root, name) {
   return null;
 }
 
-const html = await (await fetch(PAGE)).text();
+// Transient DNS/network errors on runners (EAI_AGAIN seen in run 38176398394): retry with backoff.
+async function fetchText(url, tries = 6) {
+  for (let i = 1; ; i++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      return await res.text();
+    } catch (e) {
+      if (i >= tries) throw e;
+      console.log(`fetch attempt ${i} failed (${e.cause?.code ?? e.message}); retrying`);
+      await new Promise((r) => setTimeout(r, 5000 * i));
+    }
+  }
+}
+
+const html = await fetchText(PAGE);
 mkdirSync(workdir, { recursive: true });
 const datasets = [];
 const foods = new Map();
@@ -63,7 +78,7 @@ for (const [kind, re] of Object.entries(KINDS)) {
   const zipName = names.at(-1);
   const url = new URL(`/fdc-datasets/${zipName}`, PAGE).href;
   const zip = join(workdir, zipName);
-  execFileSync('curl', ['-fsSL', '-o', zip, url]);
+  execFileSync('curl', ['-fsSL', '--retry', '6', '--retry-all-errors', '--retry-delay', '10', '-o', zip, url]);
   const dir = join(workdir, kind);
   execFileSync('unzip', ['-q', '-o', zip, '-d', dir]);
   const csv = findCsvDir(dir, 'food.csv');
