@@ -45,13 +45,19 @@ export function App() {
         async refreshCatalog() {
           const cur = stateRef.current!;
           const [custom, recipes] = await Promise.all([listCustomFoods(cur.db), listRecipes(cur.db)]);
-          setState((p) => buildState(cur.db, (p ?? cur).settings, cur.seed, custom, recipes));
+          setState((p) => {
+            const next = buildState(cur.db, (p ?? cur).settings, cur.seed, custom, recipes);
+            stateRef.current = next;
+            return next;
+          });
         },
         async updateSettings(patch: Partial<SettingsT>) {
           const cur = stateRef.current!;
+          // Update the ref synchronously so back-to-back calls compose instead of clobbering.
           const settings = { ...cur.settings, ...patch };
+          stateRef.current = { ...cur, settings };
           await persistSettings(cur.db, settings);
-          setState((p) => (p ? { ...p, settings } : p));
+          setState((p) => (p ? { ...p, settings: { ...p.settings, ...patch } } : p));
         },
       },
     };
