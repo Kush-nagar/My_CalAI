@@ -66,3 +66,21 @@ describe('trends', () => {
 describe('splitAliases', () => {
   it('splits, trims and dedupes', () => expect(splitAliases('dahi, curd ,dahi;')).toEqual(['dahi', 'curd']));
 });
+
+describe('review regressions', () => {
+  it('rejects ambiguous thousands commas instead of reading 1,250 as 1.25', () => {
+    expect(parseDecimal('1,250')).toBeNull();
+    expect(parseDecimal('1,25')).toBe(1.25);
+  });
+  it("re-editing keeps the entry's own serving conversion even if the catalog changed", () => {
+    const f: Food = {
+      id: 'r:x', name: 'Rajma', aliases: [], state: 'prepared', tags: [], source: { kind: 'recipe', name: 'r' },
+      per100g: { energy_kcal: { amount: 100, kind: 'calculated' } },
+      servings: [{ label: '1 serving', grams: 250, evidence: '1/4 of batch', source: 'user_calibrated' }], revision: 1,
+    };
+    const e = buildEntry({ food: f, portion: makePortion(f, 1, '1 serving'), meal: 'lunch', localDate: '2026-10-11' });
+    const changed = { ...f, servings: [{ ...f.servings[0], grams: 125 }] };
+    const rebuilt = foodFromEntry(e, changed);
+    expect(makePortion(rebuilt, 1, '1 serving').grams).toBe(250);
+  });
+});

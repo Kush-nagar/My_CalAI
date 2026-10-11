@@ -62,7 +62,7 @@ export function PortionView(props: {
       const portion = makePortion(food, q, unit);
       let imageId: string | undefined;
       if (props.photo && state.settings.keepPhotos) {
-        const asset: ImageAsset = { id: newId('img:'), blob: props.photo, mime: props.photo.type || 'image/jpeg', createdAt: new Date().toISOString() };
+        const asset: ImageAsset = { id: newId('img:'), blob: props.photo, mime: 'image/jpeg', createdAt: new Date().toISOString() };
         await putImage(state.db, asset);
         imageId = asset.id;
       }
@@ -155,7 +155,7 @@ export function PortionView(props: {
           {s.retrievedAt ? <><dt>Retrieved</dt><dd>{s.retrievedAt}</dd></> : null}
           {s.url ? <><dt>Link (text only)</dt><dd class="break">{s.url}</dd></> : null}
           {food.notes ? <><dt>Notes</dt><dd>{food.notes}</dd></> : null}
-          <dt>Basis</dt><dd>Values are per 100 g, scaled to your portion.</dd>
+          <dt>Basis</dt><dd>{gramsMeaningful ? 'Values are per 100 g, scaled to your portion.' : 'Cooked weight was not weighed, so values are per serving (a share of the whole batch).'}</dd>
         </dl>
       </details>
 

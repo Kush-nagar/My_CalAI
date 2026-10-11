@@ -29,7 +29,7 @@ export function RecipeEditor(props: { initial?: Recipe; onDone(): void }) {
   const [saving, setSaving] = useState(false);
 
   const hits = useMemo(
-    () => (query.trim() ? state.index.search(query, 8).filter((h) => h.item.id !== init?.id) : []),
+    () => (query.trim() ? state.index.search(query, 12).filter((h) => h.item.id !== init?.id && h.item.portionMode !== 'servings_only').slice(0, 8) : []),
     [query, state.index],
   );
 

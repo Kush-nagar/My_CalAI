@@ -259,7 +259,7 @@ export function BarcodeSheet({ onFound, onManualEntry, onClose }: Props) {
         )}
 
         {phase.t === 'off-preview' && (
-          <OffPreviewView preview={phase.preview} busy={busy} onSave={() => saveOff(phase.preview)} onManual={() => onManualEntry(phase.code)} />
+          <OffPreviewView preview={phase.preview} showKcal={state.settings.showCalories} busy={busy} onSave={() => saveOff(phase.preview)} onManual={() => onManualEntry(phase.code)} />
         )}
       </div>
     </div>
@@ -292,14 +292,14 @@ function CodeResult(p: { code: string; lookupEnabled: boolean; onLookup(): void;
   );
 }
 
-function OffPreviewView({ preview, busy, onSave, onManual }: { preview: OffPreview; busy: boolean; onSave(): void; onManual(): void }) {
+function OffPreviewView({ preview, showKcal, busy, onSave, onManual }: { preview: OffPreview; showKcal: boolean; busy: boolean; onSave(): void; onManual(): void }) {
   const f = preview.food;
   const rows: [string, string][] = [];
   const add = (label: string, code: keyof Food['per100g'], unit: string) => {
     const v = f.per100g[code];
     rows.push([label, v && v.amount !== null ? `${v.amount} ${unit}` : 'not reported']);
   };
-  add('Energy', 'energy_kcal', 'kcal');
+  if (showKcal) add('Energy', 'energy_kcal', 'kcal');
   add('Protein', 'protein_g', 'g');
   add('Carbohydrate', 'carb_g', 'g');
   add('Fat', 'fat_g', 'g');

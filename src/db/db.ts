@@ -39,6 +39,10 @@ export function openLedger(name = DB_NAME): Promise<IDBPDatabase<LedgerDB>> {
       // Another tab holds an older version open.
       console.warn('Database upgrade blocked by another open tab');
     },
+    blocking() {
+      // A newer version (e.g. after an app update in another tab) wants to upgrade: let it.
+      location.reload();
+    },
   });
 }
 

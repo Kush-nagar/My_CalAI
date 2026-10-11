@@ -2,6 +2,7 @@
 // Unknown extra fields are tolerated (forward compatibility) but every known field is checked,
 // and the generic tree walk rejects prototype-pollution keys, deep nesting and huge strings.
 import type { Food, MealEntry, Recipe, Settings } from '../domain/types';
+import { NUTRIENT_CODES } from '../domain/types';
 
 export const LIMITS = {
   maxDepth: 16,
@@ -27,6 +28,7 @@ export const ID_RE = /^[A-Za-z0-9][A-Za-z0-9:_.\-]{0,127}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:\d{2})$/;
 const NUTRIENT_KEY_RE = /^[a-z][a-z0-9_]{0,31}$/;
+const SUMMARY_CODES: readonly string[] = NUTRIENT_CODES;
 
 const VALUE_KINDS = ['measured', 'label', 'calculated', 'user', 'estimated'];
 const SOURCE_KINDS = ['usda_fdc', 'off', 'label', 'user', 'recipe', 'template'];
@@ -246,6 +248,7 @@ export function checkEntry(e: Errs, p: string, v: unknown): v is MealEntry {
     num(e, `${p}.portion.quantity`, po.quantity, 0, LIMITS.grams);
     str(e, `${p}.portion.unit`, po.unit, 100, { min: 1 });
     num(e, `${p}.portion.grams`, po.grams, 0, LIMITS.grams);
+    if (po.servingsOnly !== undefined && typeof po.servingsOnly !== 'boolean') e.push(`${p}.portion.servingsOnly: expected true/false.`);
     str(e, `${p}.portion.conversionEvidence`, po.conversionEvidence, LIMITS.shortText);
   }
   const nt = v.nutrients;
@@ -276,7 +279,7 @@ export function checkSettings(e: Errs, p: string, v: unknown): v is Partial<Sett
   bool(e, `${p}.showCalories`, v.showCalories, true);
   if (v.summaryNutrients !== undefined) {
     if (!Array.isArray(v.summaryNutrients) || v.summaryNutrients.length > 50) e.push(`${p}.summaryNutrients: expected a list.`);
-    else v.summaryNutrients.forEach((k, i) => str(e, `${p}.summaryNutrients[${i}]`, k, 32, { re: NUTRIENT_KEY_RE }));
+    else v.summaryNutrients.forEach((k, i) => oneOf(e, `${p}.summaryNutrients[${i}]`, k, SUMMARY_CODES));
   }
   bool(e, `${p}.onlineLookup`, v.onlineLookup, true);
   bool(e, `${p}.keepPhotos`, v.keepPhotos, true);

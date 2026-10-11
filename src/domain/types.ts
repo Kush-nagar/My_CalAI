@@ -133,6 +133,8 @@ export interface PortionSnapshot {
   grams: number;
   /** Evidence for unit->grams conversion (serving label evidence or "weighed"). */
   conversionEvidence: string;
+  /** True when grams are raw-ingredient weight (recipe without weighed yield): hide grams in UI. */
+  servingsOnly?: boolean;
 }
 
 /** Absolute nutrient totals for the logged portion (not per 100 g). */

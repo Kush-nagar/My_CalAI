@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { AppCtx, buildState, loadState, persistSettings, type AppState } from './store';
-import { listCustomFoods, listRecipes } from '../db/repo';
+import { deleteOrphanImages, listCustomFoods, listRecipes } from '../db/repo';
 import { localDateOf } from '../domain/portion';
 import type { MealSlot, Settings as SettingsT } from '../domain/types';
 import { Icon, type IconName } from './icons';
@@ -27,7 +27,11 @@ export function App() {
   stateRef.current = state;
 
   useEffect(() => {
-    loadState().then(setState, (e) => setError(String(e?.message ?? e)));
+    loadState().then((s) => {
+      setState(s);
+      // Clean up photos left behind by an interrupted save (image and entry are written separately).
+      deleteOrphanImages(s.db).catch(() => undefined);
+    }, (e) => setError(String(e?.message ?? e)));
   }, []);
 
   // theme: data-theme on <html>; "system" removes the override so the media query applies
@@ -83,6 +87,25 @@ function Shell() {
   const timer = useRef<number>();
   const mainRef = useRef<HTMLElement>(null);
   const first = useRef(true);
+
+  // If the app stays open past midnight, move "today" forward when it is next shown.
+  const todayRef = useRef(date);
+  useEffect(() => {
+    const onShow = () => {
+      if (document.visibilityState !== 'visible') return;
+      const now = localDateOf(new Date());
+      if (now !== todayRef.current) {
+        setDate((d) => (d === todayRef.current ? now : d));
+        todayRef.current = now;
+      }
+    };
+    document.addEventListener('visibilitychange', onShow);
+    window.addEventListener('focus', onShow);
+    return () => {
+      document.removeEventListener('visibilitychange', onShow);
+      window.removeEventListener('focus', onShow);
+    };
+  }, []);
 
   const announce = useCallback((m: string) => {
     setMsg('');

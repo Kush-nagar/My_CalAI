@@ -4,7 +4,8 @@
  * Strategy
  *  - Precache every built file (incl. lazily imported seed chunk and the barcode WASM).
  *  - Same-origin precached asset: cache-first.
- *  - Navigation: network-first, falling back to the cached app shell (works offline).
+ *  - Navigation: this version's precached index.html first (it always matches this cache's assets);
+ *    network only if the shell is missing. Network responses are never written into the cache.
  *  - Cross-origin requests (e.g. Open Food Facts) are never intercepted or cached.
  *  - New versions wait; the page asks to activate via postMessage('SKIP_WAITING').
  */
@@ -48,17 +49,9 @@ self.addEventListener('fetch', (event) => {
   if (req.mode === 'navigate') {
     event.respondWith(
       (async () => {
-        try {
-          const res = await fetch(req);
-          if (res.ok) {
-            const c = await caches.open(CACHE);
-            c.put(SHELL, res.clone()).catch(() => {});
-          }
-          return res;
-        } catch {
-          const c = await caches.open(CACHE);
-          return (await c.match(SHELL)) || (await c.match(scopeUrl.href)) || Response.error();
-        }
+        const c = await caches.open(CACHE);
+        const shell = (await c.match(SHELL)) || (await c.match(scopeUrl.href));
+        return shell || fetch(req);
       })(),
     );
     return;

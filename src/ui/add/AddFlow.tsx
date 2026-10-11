@@ -24,8 +24,11 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
 
 type Step = { kind: 'list' } | { kind: 'portion'; food: Food } | { kind: 'custom'; name?: string; barcode?: string };
 
-/** Downscale a camera photo before storing it; falls back to the original if the browser cannot decode it. */
-async function shrink(file: Blob): Promise<Blob> {
+/**
+ * Re-encode a photo as a downscaled JPEG. Re-encoding always happens because it strips EXIF
+ * metadata (e.g. GPS location). If the browser cannot decode the file, it is not kept at all.
+ */
+async function shrink(file: Blob): Promise<Blob | null> {
   try {
     const bmp = await createImageBitmap(file);
     const scale = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
@@ -34,9 +37,10 @@ async function shrink(file: Blob): Promise<Blob> {
     c.height = Math.round(bmp.height * scale);
     c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
     const out = await new Promise<Blob | null>((r) => c.toBlob(r, 'image/jpeg', 0.82));
-    return out && out.size < file.size ? out : file;
+    bmp.close();
+    return out;
   } catch {
-    return file;
+    return null;
   }
 }
 
@@ -174,10 +178,10 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
                   const kcal = e.nutrients.values.energy_kcal;
                   return (
                     <li key={e.id} class="row row-split">
-                      <button type="button" class="row-body" onClick={() => pick(foodFromEntry(e, cat))} aria-label={`${e.item.name}, last ${portionLabel(e.portion, { hideGrams: cat?.portionMode === 'servings_only' })}. Change amount`}>
+                      <button type="button" class="row-body" onClick={() => pick(foodFromEntry(e, cat))} aria-label={`${e.item.name}, last ${portionLabel(e.portion, { hideGrams: e.portion.servingsOnly ?? cat?.portionMode === 'servings_only' })}. Change amount`}>
                         <span class="row-title">{e.item.name}</span>
                         <span class="row-sub">
-                          <span>{portionLabel(e.portion, { hideGrams: cat?.portionMode === 'servings_only' })}</span>
+                          <span>{portionLabel(e.portion, { hideGrams: e.portion.servingsOnly ?? cat?.portionMode === 'servings_only' })}</span>
                           {showKcal && kcal !== undefined ? <span class="num">{formatNutrient('energy_kcal', kcal)}</span> : null}
                         </span>
                       </button>
@@ -259,7 +263,12 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
   async function onFile(e: Event) {
     const f = (e.target as HTMLInputElement).files?.[0];
     if (!f) return;
-    setPhoto(await shrink(f));
+    const img = await shrink(f);
+    if (!img) {
+      ui.announce('This photo format could not be read, so it was not attached.');
+      return;
+    }
+    setPhoto(img);
     ui.announce('Photo attached');
   }
 

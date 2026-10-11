@@ -23,7 +23,9 @@ export function makePortion(food: Food, quantity: number, unit: string): Portion
   if (!Number.isFinite(quantity) || quantity <= 0 || quantity > 100000) throw new RangeError('Enter an amount greater than 0');
   const opt = unitOptions(food).find((o) => o.unit === unit);
   if (!opt) throw new Error(`No evidence-backed conversion for "${unit}"`);
-  return { quantity, unit, grams: quantity * opt.gramsPerUnit, conversionEvidence: opt.evidence };
+  const p: PortionSnapshot = { quantity, unit, grams: quantity * opt.gramsPerUnit, conversionEvidence: opt.evidence };
+  if (food.portionMode === 'servings_only') p.servingsOnly = true;
+  return p;
 }
 
 /** YYYY-MM-DD in the device's local timezone. */

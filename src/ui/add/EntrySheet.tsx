@@ -44,9 +44,10 @@ export function EntrySheet(props: { entry: MealEntry; onClose(): void }) {
     if (qtyError || q === null) return setError(qtyError ?? 'Enter an amount.');
     setSaving(true);
     try {
-      const portion = makePortion(food, q, unit);
+      // Only recompute when the amount or unit actually changed; otherwise keep the snapshot.
+      const unchanged = q === e.portion.quantity && unit === e.portion.unit;
       const next: MealEntry = {
-        ...editEntryPortion(e, portion),
+        ...(unchanged ? { ...e, updatedAt: new Date().toISOString() } : editEntryPortion(e, makePortion(food, q, unit))),
         meal,
         note: note.trim() || undefined,
         estimate: estimated ? 'estimated' : 'measured',

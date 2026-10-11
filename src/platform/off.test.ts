@@ -98,3 +98,10 @@ describe('isValidGtin', () => {
     expect(isValidGtin('abcdefgh')).toBe(false);
   });
 });
+
+describe('UPC-A lookups', () => {
+  it('accepts OFF returning the 13-digit form of a 12-digit UPC-A', () => {
+    const body = { status: 1, product: { code: '0737628064502', product_name: 'Rice noodles', nutriments: { 'energy-kcal_100g': 380 } } };
+    expect(mapOffResponse(body, '737628064502', '2026-10-11T00:00:00Z').food.per100g.energy_kcal?.amount).toBe(380);
+  });
+});

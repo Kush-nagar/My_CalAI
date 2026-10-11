@@ -1,8 +1,8 @@
 # Thali privacy and safety audit
 
-Audit date: 2026-10-11. Scope: the code in this repository at the time of writing, plus the
-platform worker's in-progress `src/platform/` files (Open Food Facts adapter, service worker,
-storage persistence), which were read but are not yet committed. Re-run the checks in
+Audit date: 2026-10-11. Scope: the integrated code in this repository (UI, storage, backup,
+service worker, barcode scanner, Open Food Facts adapter), re-checked by an independent review
+after integration. Re-run the checks in
 "How to re-check" before every release.
 
 ## In one paragraph
@@ -23,7 +23,7 @@ backup file that you choose to save or share. A backup can be locked with a pass
 | Recipes | IndexedDB, store `recipes` | |
 | Settings (age band, calorie visibility, online lookup on/off, photo retention, theme, last backup time) and favourites | IndexedDB, store `kv` | The age band is personal information. |
 | App files (code, built-in food list) | Cache Storage `thali-<version>` (service worker) | No personal data. |
-| "Persistence already requested" flag | `localStorage` `thali.persistRequested` (platform worker) | One flag, no personal data. |
+| "Persistence already requested" flag | `localStorage` `thali.persistRequested`  | One flag, no personal data. |
 | Backup files | Wherever you save them (Files, iCloud Drive, Downloads, a share target) | Leave the app's protection. See section 5. |
 
 Nothing in IndexedDB is encrypted by the app itself. It is protected by the browser's per-site
@@ -49,13 +49,13 @@ grep -rnE "fetch\(|XMLHttpRequest|WebSocket|sendBeacon|EventSource|importScripts
 ```
 
 Findings on 2026-10-11:
-- Committed code: no network calls. Only `navigator.share` in `src/ui/backup/BackupPanel.tsx`
+- App code: no network calls except the Open Food Facts lookup below. Also `navigator.share` in `src/ui/backup/BackupPanel.tsx`
   (user-triggered share sheet) and a dynamic `import()` of the bundled food list (same origin).
-- `src/platform/off.ts` (in progress): one `fetch` to the Open Food Facts URL above. It checks the
+- `src/platform/off.ts`: one `fetch` to the Open Food Facts URL above. It checks the
   barcode is 8–14 digits, uses an 8-second timeout, `credentials: 'omit'` and `referrerPolicy: 'no-referrer'`.
-  The UI must call it only after a button press and only when `settings.onlineLookup` is on
-  (default off). Check this when the UI is merged.
-- `src/platform/sw-template.js` (in progress): `fetch` of same-origin requests only; cross-origin
+  The barcode sheet calls it only after the user presses "Look up on Open Food Facts", and that
+  button only appears when `settings.onlineLookup` is on (default off). Verified after integration.
+- `src/platform/sw-template.js`: `fetch` of same-origin requests only; cross-origin
   requests are ignored.
 - `scripts/data/fetch-usda.mjs` downloads USDA data at **build time** (GitHub Actions). It is not shipped to the app.
 - `package.json` contains GitHub URLs as metadata only.
@@ -160,3 +160,8 @@ The UI worker's screens were not part of this audit. Check them against these ru
    and rollback on failure (`src/backup/backup.test.ts`).
 4. In the browser's devtools Network tab, use the app offline and online with lookup off: there
    should be no requests except app files.
+
+## Photos
+Attached photos are always re-encoded as a downscaled JPEG before storage, which strips EXIF metadata
+such as GPS location. Photos the browser cannot decode are not stored. Unreferenced photos are deleted
+at app start.

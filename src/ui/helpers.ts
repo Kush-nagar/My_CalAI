@@ -28,6 +28,8 @@ export function defaultMeal(d: Date = new Date()): MealSlot {
 export function parseDecimal(raw: string): number | null {
   let s = raw.trim();
   if (!s) return null;
+  // "1,5" is a decimal comma; "1,250" is ambiguous (thousands?) so it is rejected rather than read as 1.25.
+  if (/^\d*,\d{3}$/.test(s)) return null;
   if (s.includes(',') && !s.includes('.')) s = s.replace(',', '.');
   if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return null;
   const n = Number(s);
@@ -100,10 +102,12 @@ export function dayHeading(localDate: string, todayDate: string): { main: string
  * borrowing evidence-backed servings from the current catalog food.
  */
 export function foodFromEntry(entry: MealEntry, catalog?: Food): Food {
-  const servings: ServingConversion[] = catalog ? [...catalog.servings] : [];
+  // The entry's own unit conversion wins over the catalog's current one, so editing or
+  // re-logging an old entry never silently changes what it meant (e.g. recipe servings changed).
   const u = entry.portion.unit;
-  if (u !== 'g' && !servings.some((s) => s.label === u) && entry.portion.quantity > 0) {
-    servings.push({
+  const servings: ServingConversion[] = (catalog?.servings ?? []).filter((s) => s.label !== u);
+  if (u !== 'g' && entry.portion.quantity > 0) {
+    servings.unshift({
       label: u,
       grams: entry.portion.grams / entry.portion.quantity,
       evidence: entry.portion.conversionEvidence,
@@ -119,7 +123,7 @@ export function foodFromEntry(entry: MealEntry, catalog?: Food): Food {
     source: entry.item.source,
     per100g: entry.per100g,
     servings,
-    portionMode: catalog?.portionMode,
+    portionMode: entry.portion.servingsOnly ? 'servings_only' : catalog?.portionMode,
     revision: entry.item.revision,
   };
 }

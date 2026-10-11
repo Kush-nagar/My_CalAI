@@ -115,7 +115,7 @@ export function Today() {
                   <ul class="list">
                     {list.map((e) => {
                       const cat = state.foodsById.get(e.item.refId);
-                      const label = portionLabel(e.portion, { hideGrams: cat?.portionMode === 'servings_only' });
+                      const label = portionLabel(e.portion, { hideGrams: e.portion.servingsOnly ?? cat?.portionMode === 'servings_only' });
                       const kc = e.nutrients.values.energy_kcal;
                       const sr = `${e.item.name}, ${label}${showKcal && kc !== undefined ? `, ${formatNutrient('energy_kcal', kc)}` : ''}${e.estimate === 'estimated' ? ', estimated' : ''}. Edit entry`;
                       return (

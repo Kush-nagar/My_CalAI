@@ -1,3 +1,4 @@
+import { barcodeCandidates } from './gtin';
 // Open Food Facts (OFF) barcode lookup. The ONLY runtime network call in the app, and only when the
 // user presses "Look up on Open Food Facts". Sends just the barcode in the URL path.
 //
@@ -113,7 +114,7 @@ export function mapOffResponse(body: unknown, barcode: string, retrievedAt: stri
   if (!found || !b.product || typeof b.product !== 'object') throw new OffError('not_found', 'Not found on Open Food Facts');
   const p = b.product as Record<string, unknown>;
   const code = typeof p.code === 'string' ? p.code : barcode;
-  if (code !== barcode) throw new OffError('bad_response', 'Open Food Facts returned a different barcode');
+  if (code !== barcode && !barcodeCandidates(barcode).includes(code)) throw new OffError('bad_response', 'Open Food Facts returned a different barcode');
 
   const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, 200) : undefined);
   const name = str(p.product_name) ?? `Product ${barcode}`;
