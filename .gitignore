@@ -5,3 +5,4 @@ playwright-report/
 *.local
 .env*
 .claude/worktrees/
+thali-pwa-*.zip
