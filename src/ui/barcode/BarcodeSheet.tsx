@@ -5,6 +5,7 @@ import { barcodeCandidates, isValidGtin } from '../../platform/gtin';
 import { lookupOff, OffError, OFF_ATTRIBUTION, OFF_CAVEAT, type OffPreview } from '../../platform/off';
 import type { Food } from '../../domain/types';
 
+export type BarcodeSheetProps = Props;
 type Props = {
   onFound(food: Food): void;
   onManualEntry(barcode: string): void;
