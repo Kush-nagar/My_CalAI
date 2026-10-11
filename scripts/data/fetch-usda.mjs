@@ -17,6 +17,13 @@ const NUTRIENTS = {
   1093: 'sodium_mg', 1092: 'potassium_mg', 1087: 'calcium_mg', 1089: 'iron_mg', 1095: 'zinc_mg',
   1162: 'vitc_mg', 1190: 'folate_ug', 1178: 'vitb12_ug',
 };
+// Legacy SR nutrient numbers for the same nutrients (fallback when a CSV keys by number).
+const NUTRIENT_NBR = {
+  208: 'energy_kcal', 957: 'energy_kcal_atwater_general', 958: 'energy_kcal_atwater_specific',
+  203: 'protein_g', 205: 'carb_g', 204: 'fat_g', 291: 'fiber_g', 269: 'sugars_g', 606: 'satfat_g',
+  307: 'sodium_mg', 306: 'potassium_mg', 301: 'calcium_mg', 303: 'iron_mg', 309: 'zinc_mg',
+  401: 'vitc_mg', 435: 'folate_ug', 418: 'vitb12_ug',
+};
 
 // Auxiliary CSVs differ per dataset (e.g. FNDDS has no food_category.csv): skip when absent.
 async function optRows(file, onRow) {
@@ -39,7 +46,7 @@ async function csvRows(file, onRow) {
     }
     cells.push(cur);
     buf = '';
-    if (!header) { header = cells; continue; }
+    if (!header) { header = cells.map((h) => h.replace(/^\uFEFF/, '').trim()); continue; }
     onRow(Object.fromEntries(header.map((h, i) => [h, cells[i]])));
   }
 }
@@ -96,14 +103,34 @@ for (const [kind, re] of Object.entries(KINDS)) {
     local.set(r.fdc_id, { fdcId: Number(r.fdc_id), dataset: kind, dataType: r.data_type, desc: r.description, cat: cats.get(r.food_category_id) ?? null, published: r.publication_date, n: {}, portions: [] });
   });
   await optRows(join(csv, 'survey_fndds_food.csv'), (r) => { const f = local.get(r.fdc_id); if (f) { f.foodCode = r.food_code; f.cat = wweia.get(r.wweia_category_number ?? r.wweia_category_code) ?? f.cat; } });
+  // Map by FDC nutrient id; fall back to legacy nutrient numbers (via nutrient.csv) because the
+  // FNDDS CSV produced zero matches by id in the extract committed as 8a27595. Log enough to diagnose either way.
+  const nbrOf = new Map();
+  await optRows(join(csv, 'nutrient.csv'), (r) => nbrOf.set(r.id, r.nutrient_nbr));
+  let rows = 0, matched = 0, byNbr = 0;
+  const sampleIds = new Map();
   await csvRows(join(csv, 'food_nutrient.csv'), (r) => {
-    const f = local.get(r.fdc_id); const code = NUTRIENTS[r.nutrient_id];
-    if (f && code && r.amount !== '') f.n[code] = Number(r.amount);
+    rows++;
+    if (rows <= 3) console.log('  food_nutrient sample', JSON.stringify(r));
+    const f = local.get(r.fdc_id);
+    if (!f) return;
+    let code = NUTRIENTS[r.nutrient_id];
+    if (!code) {
+      // Via nutrient.csv when present; else the id itself may be a legacy number (FDC ids are >= 1000).
+      const nbr = String(nbrOf.get(r.nutrient_id) ?? r.nutrient_id ?? '').replace(/\.0+$/, '');
+      code = NUTRIENT_NBR[nbr];
+      if (code) byNbr++;
+    }
+    if (sampleIds.size < 40) sampleIds.set(r.nutrient_id, (sampleIds.get(r.nutrient_id) ?? 0) + 1);
+    if (code && r.amount !== '' && Number.isFinite(Number(r.amount))) { f.n[code] = Number(r.amount); matched++; }
   });
+  console.log(`  food_nutrient rows ${rows}, mapped ${matched} (${byNbr} via nutrient_nbr); nutrient.csv entries ${nbrOf.size}; sample nutrient_ids ${[...sampleIds.keys()].slice(0, 40).join(',')}`);
+  const noN = [...local.values()].filter((f) => !Object.keys(f.n).length).length;
+  if (noN === local.size) throw new Error(`${kind}: no nutrients mapped for any food; see log above`);
   await optRows(join(csv, 'food_portion.csv'), (r) => {
     const f = local.get(r.fdc_id); if (!f || !(Number(r.gram_weight) > 0)) return;
     const unit = units.get(r.measure_unit_id);
-    const label = [r.amount && r.amount !== '' ? r.amount : '', unit && unit !== 'undetermined' ? unit : '', r.portion_description, r.modifier].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+    const label = [r.amount && r.amount !== '' ? r.amount : '', unit && unit !== 'undetermined' ? unit : '', r.portion_description, /^\d+$/.test(r.modifier ?? '') ? '' : r.modifier].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
     f.portions.push({ label, g: Number(r.gram_weight) });
   });
   for (const [id, f] of local) foods.set(id, f);
