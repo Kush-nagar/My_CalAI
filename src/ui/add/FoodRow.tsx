@@ -7,7 +7,10 @@ import { normalize } from '../../domain/search';
 /** One catalog row: name, matched alias, state, source chip, optional kcal per 100 g. */
 export function FoodRow(props: { food: Food; matched?: string; showKcal: boolean; onClick(): void }) {
   const { food } = props;
-  const kcal = food.per100g.energy_kcal?.amount;
+  // Servings-only items (recipes without weighed yield) have no meaningful per-100 g figure.
+  const perServing = food.portionMode === 'servings_only' ? food.servings[0] : undefined;
+  const k100 = food.per100g.energy_kcal?.amount;
+  const kcal = k100 == null ? k100 : perServing ? (k100 * perServing.grams) / 100 : k100;
   const alias = props.matched && normalize(props.matched) !== normalize(food.name) && food.aliases.includes(props.matched) ? props.matched : null;
   const st = stateLabel(food.state);
   return (
@@ -27,7 +30,7 @@ export function FoodRow(props: { food: Food; matched?: string; showKcal: boolean
             {kcal !== null && kcal !== undefined ? (
               <>
                 <span class="num strong">{formatNutrient('energy_kcal', kcal).replace(' kcal', '')}</span>
-                <span class="small muted">kcal / 100 g</span>
+                <span class="small muted">{perServing ? `kcal / ${perServing.label.replace(/^1 /, '')}` : 'kcal / 100 g'}</span>
               </>
             ) : (
               <span class="small muted">kcal not reported</span>
