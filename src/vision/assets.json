@@ -1,0 +1,41 @@
+{
+  "id": "siglip2-b16-224-q4",
+  "repo": "onnx-community/siglip2-base-patch16-224-ONNX",
+  "revision": "ba1f3b0843f24bc5417d38e19c37b287d719b2f4",
+  "baseRepo": "google/siglip2-base-patch16-224",
+  "baseRevision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+  "license": "Apache-2.0",
+  "retrievedAt": "2026-10-11T22:22:49.613Z",
+  "files": [
+    {
+      "path": "vision_model_q4.onnx",
+      "bytes": 63267466,
+      "sha256": "03e61be280fb24114facd87a1e1e6b2b654aad49845686da2f930c72740914aa"
+    },
+    {
+      "path": "preprocessor_config.json",
+      "bytes": 394,
+      "sha256": "9b36b57ebaf20f09bf4c22100ccc21877ea6bfe5aead0c00c59f8af8ccefacfc"
+    }
+  ],
+  "preprocess": {
+    "size": {
+      "height": 224,
+      "width": 224
+    },
+    "rescale": 0.00392156862745098,
+    "mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "std": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "resample": 2
+  },
+  "logitScale": 4.724453449249268,
+  "logitBias": -16.771724700927734
+}
