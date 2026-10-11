@@ -95,6 +95,24 @@ describe('model download', () => {
     expect(await isInstalled(m, { caches: c })).toBe(false);
   });
 
+  it('an interrupted stream (connection dropped mid-file) is reported and nothing partial is stored', async () => {
+    const m = await manifest();
+    const broken = (async () =>
+      new Response(
+        new ReadableStream({
+          start(c) {
+            c.enqueue(A.slice(0, 5));
+            c.error(new TypeError('connection reset'));
+          },
+        }),
+      )) as unknown as typeof fetch;
+    const caches = memCaches();
+    await expect(downloadModel(m, {}, deps(broken, caches))).rejects.toMatchObject({ code: 'network' });
+    const c = await caches.open(cacheName(m));
+    expect(await c.match(m.files[0].url)).toBeUndefined();
+    expect(await isInstalled(m, { caches })).toBe(false);
+  });
+
   it('reports a storage error when the device is full', async () => {
     const m = await manifest();
     const err = await downloadModel(m, {}, deps(fetcher({ [m.files[0].url]: A }), memCaches({ failPut: true }))).catch((e) => e);

@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "package": "node scripts/package.mjs",
-    "icons": "node scripts/make-icons.mjs"
+    "icons": "node scripts/make-icons.mjs",
+    "test:vision": "playwright test --config=tests/parity/playwright.config.ts"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   "homepage": "https://github.com/Kush-nagar/My_CalAI#readme",
   "dependencies": {
     "idb": "^8.0.4",
+    "onnxruntime-web": "^1.30.0",
     "preact": "^10.29.8",
     "zxing-wasm": "3.1.5"
   },

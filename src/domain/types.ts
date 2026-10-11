@@ -190,6 +190,8 @@ export interface Settings {
   onlineLookup: boolean;
   /** Keep attached meal photos on device. */
   keepPhotos: boolean;
+  /** User opted in to on-device photo food-name suggestions (model downloaded on request). */
+  photoSuggestions: boolean;
   theme: 'system' | 'light' | 'dark';
   lastBackupAt?: string;
   onboarded: boolean;
@@ -201,6 +203,7 @@ export const DEFAULT_SETTINGS: Settings = {
   summaryNutrients: ['energy_kcal', 'protein_g', 'carb_g', 'fat_g', 'fiber_g'],
   onlineLookup: false,
   keepPhotos: false,
+  photoSuggestions: false,
   theme: 'system',
   onboarded: false,
 };

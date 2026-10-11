@@ -6,6 +6,7 @@ import { Icon } from '../icons';
 import { useApp } from '../store';
 import { useUi } from '../ui';
 import { BackupPanel } from '../backup/BackupPanel';
+import { ModelPanel } from '../vision/ModelPanel';
 
 export function SafetyNote() {
   return (
@@ -112,7 +113,7 @@ export function Settings() {
         />
         <Switch
           label="Keep meal photos"
-          hint="Photos you attach to an entry are saved on this device only, as a memory aid. Photo recognition is not available."
+          hint="Photos you attach to an entry are saved on this device only, as a memory aid."
           checked={s.keepPhotos}
           onChange={(v) => void set({ keepPhotos: v })}
         />
@@ -126,6 +127,11 @@ export function Settings() {
             ui.announce('All photos deleted');
           }}
         />
+      </section>
+
+      <section class="card" aria-labelledby="s-photo">
+        <h2 id="s-photo">Photo suggestions</h2>
+        <ModelPanel />
       </section>
 
       <section class="card" aria-labelledby="s-store">
@@ -154,6 +160,7 @@ export function Settings() {
           <li>USDA FoodData Central, public domain (CC0).</li>
           <li>Open Food Facts product data, ODbL, only when you turn on online lookup.</li>
           <li>Your own foods and recipes, and package labels you type in.</li>
+          <li>Optional photo suggestions: SigLIP 2 image model by Google, Apache-2.0, run on this device with ONNX Runtime Web (MIT).</li>
         </ul>
         <p class="hint">Every food shows its source, record ID and licence under “Source and details”. Full licence notes are in the project at docs/LICENSES.md.</p>
       </section>
