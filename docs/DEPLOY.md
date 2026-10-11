@@ -54,3 +54,10 @@ hash as the cache name, so each build is a new version and old caches are delete
 (falls back to the cached shell offline); assets are cache-first; cross-origin requests (Open Food Facts) are never intercepted.
 Serve `sw.js` without long-lived HTTP caching (GitHub Pages sends a short max-age, which is fine; the browser also bypasses the
 HTTP cache for service worker script updates after 24 h at most).
+
+## Origin note for GitHub Pages
+All project sites of one GitHub account share the origin `https://kush-nagar.github.io`. Browser storage
+(IndexedDB) is per origin, so any *other* Pages site you publish under the same account could, in principle, read
+Thali's local data through script. Only publish sites you trust under this account, or move Thali to a dedicated
+origin (a separate account's `<name>.github.io`, or Cloudflare Pages) if you later host third-party code there.
+Moving to a new address starts with empty storage: export a backup first and restore it at the new address.
