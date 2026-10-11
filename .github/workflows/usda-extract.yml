@@ -1,0 +1,25 @@
+name: USDA data extract
+# Fetches public-domain USDA FoodData Central CSVs and commits a compact extract.
+# Runs only when the fetch script changes (or manually). Uses free GitHub-hosted minutes.
+on:
+  workflow_dispatch:
+  push:
+    paths: ['scripts/data/fetch-usda.mjs', '.github/workflows/usda-extract.yml']
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/data/fetch-usda.mjs "$RUNNER_TEMP/usda" scripts/data/raw/usda-extract.json.gz
+      - name: Commit extract
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/data/raw/usda-extract.json.gz
+          git diff --cached --quiet || git commit -m "data: refresh USDA FoodData Central extract (CC0)"
+          git push
