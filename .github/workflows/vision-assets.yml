@@ -1,0 +1,27 @@
+name: Vision assets
+# Downloads the pinned SigLIP2 vision encoder (Apache-2.0), verifies its SHA-256, precomputes label
+# embeddings with the text encoder, and commits the results. Free GitHub-hosted minutes only.
+on:
+  workflow_dispatch:
+  push:
+    paths: ['scripts/vision/**', '.github/workflows/vision-assets.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm i --no-save --no-package-lock @huggingface/transformers@4.3.1
+      - run: node scripts/vision/build-assets.mjs
+      - name: Commit assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/models src/vision/assets.json src/vision/label-embeddings.json tests/fixtures/vision-reference.json
+          git diff --cached --quiet || git commit -m "vision: build SigLIP2 assets and label embeddings (Apache-2.0)"
+          git pull --rebase
+          git push
