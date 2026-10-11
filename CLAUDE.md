@@ -12,7 +12,7 @@ installed taste/UI skill (`design-taste-frontend` / `taste-ui`) for all frontend
 - Subagents: include the loaded skill instructions in the task prompt (or configure them in
   the agent definition). Naming a skill is not loading it.
 - If a skill is missing, say so in the report. Never invent its instructions or claim it was used.
-- Status as of 2026-10-11 (cloud session): none of the four were installed. "Caveman" plugins
+- Status as of 2026-10-11 (two cloud sessions, re-checked): none of the four were installed. "Caveman" plugins
   exist in the Anthropic plugin directory but were not enabled; Ponytail, Impeccable and a taste UI
   skill were not found. An official `frontend-design` plugin exists but was not enabled.
 
@@ -42,7 +42,8 @@ installed taste/UI skill (`design-taste-frontend` / `taste-ui`) for all frontend
 - `src/data/` bundled license-cleared seed catalog (`seed/foods.json`) built by `scripts/data/`.
 - `src/backup/` export/validate/restore (staged, checksummed, optional AES-GCM passphrase encryption).
 - `src/platform/` service worker registration, storage persistence, barcode, OFF adapter.
-- `src/ui/` Preact screens; `store.ts` provides app context.
+- `src/vision/` optional on-device photo suggestions: download manager, worker (ORT), scoring, matching.
+- `src/ui/` Preact screens; `store.ts` provides app context; `src/ui/vision/` model state + review UI.
 - Static build: `npm run build` → `dist/` (relative base, works under any path).
 
 ## Commands
