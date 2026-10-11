@@ -1,0 +1,39 @@
+{
+  "name": "thali-ledger",
+  "version": "0.1.0",
+  "description": "Private offline-first Indian food journal (PWA)",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kush-nagar/My_CalAI.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Kush-nagar/My_CalAI/issues"
+  },
+  "homepage": "https://github.com/Kush-nagar/My_CalAI#readme",
+  "dependencies": {
+    "idb": "^8.0.4",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56",
+    "@preact/preset-vite": "^2.10.6",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.4",
+    "vitest": "^3.2.7"
+  },
+  "private": true,
+  "type": "module"
+}
