@@ -161,6 +161,17 @@ The UI worker's screens were not part of this audit. Check them against these ru
 4. In the browser's devtools Network tab, use the app offline and online with lookup off: there
    should be no requests except app files.
 
+## Photo suggestions (optional)
+- Off by default. Nothing model-related is downloaded until you choose "Set up photo suggestions" and confirm the size.
+- The model (≈63 MB) and runtime (≈27 MB) download from Thali's own website into Cache Storage
+  (`model-cache:*`). They contain no personal data.
+- Suggestions run in a Web Worker on your device, reading only those cached files. The photo and diary are
+  never sent anywhere; the worker makes no network requests. This is enforced by the CSP and checked by
+  `tests/e2e/photo-suggest.spec.ts`.
+- Remove it in Settings. If iOS clears website data, the app shows that the model is gone and keeps working
+  without it.
+- Backups contain the `photoSuggestions` on/off setting only, not the model files.
+
 ## Photos
 Attached photos are always re-encoded as a downscaled JPEG before storage, which strips EXIF metadata
 such as GPS location. Photos the browser cannot decode are not stored. Unreferenced photos are deleted

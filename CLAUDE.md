@@ -19,14 +19,19 @@ installed taste/UI skill (`design-taste-frontend` / `taste-ui`) for all frontend
 ## Hard rules (from the handoff; do not relax)
 - $0 added cost. No accounts, cloud DB, analytics, crash SDKs, paid APIs, trials or credits.
 - Diary, recipes, photos and settings live in IndexedDB on the device. Never upload photos or diary.
-- The only network call allowed at runtime is the opt-in, user-triggered Open Food Facts barcode
-  lookup (sends only the barcode). CSP in `index.html` enforces this; keep it tight.
+- The only third-party network call allowed at runtime is the opt-in, user-triggered Open Food Facts
+  barcode lookup (sends only the barcode). The opt-in model download is same-origin. CSP in
+  `index.html` enforces this; keep it tight.
 - Missing nutrient = `null` with reason, never 0. Totals with unknown parts are flagged incomplete.
 - Diary entries store immutable nutrient snapshots (`MealEntry.per100g` + `nutrients`).
 - Household measures only with evidence (`ServingConversion.evidence`); otherwise grams.
 - Do not bundle IFCT-derived data or any data/model/asset without a recorded license (docs/LICENSES.md).
-- No photo recognition is shipped: no lawful, validated Indian-food model cleared the gate. Never
-  simulate recognition or invent confidence values.
+- Photo suggestions (docs/PHOTO_SUGGESTIONS.md) are optional and off by default: SigLIP2 image encoder
+  (Apache-2.0) runs on-device in a worker; model files download only after explicit opt-in, from the
+  app's own origin (`models/`, `ort/`), into Cache Storage `model-cache:*` (never `thali-*`, never
+  precached). Suggestions are our own labels only; never show scores/confidence, never prefill amounts,
+  never estimate calories/portions/oil, never save without the user confirming each food. Not yet
+  verified on a real iPhone — do not claim it works there until it has been.
 - Under-18 mode: no calorie targets, deficit/weight-loss messaging, streaks, scores, body
   comparison or exercise-to-earn-food; calories hidden by default; neutral education only.
 - No Cal AI branding, names, graphics or layouts.
@@ -42,4 +47,6 @@ installed taste/UI skill (`design-taste-frontend` / `taste-ui`) for all frontend
 
 ## Commands
 `npm test` (vitest) · `npm run typecheck` · `npm run build` · `npm run test:e2e` (Playwright,
-Chromium at /opt/pw-browsers; WebKit not available in the cloud container).
+Chromium at /opt/pw-browsers; WebKit not available in the cloud container) · `npm run test:vision`
+(browser embedding parity vs CI reference). Vision assets are rebuilt by the "Vision assets"
+GitHub Actions job (`scripts/vision/`), because huggingface.co is blocked in the dev container.
