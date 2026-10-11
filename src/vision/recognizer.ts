@@ -72,6 +72,8 @@ export class Recognizer {
   private seq = 0;
   private pending = new Map<number, { resolve(e: Float32Array[]): void; reject(e: Error): void }>();
   private rejectLoad: ((e: Error) => void) | null = null;
+  /** Set by cancel(): this instance never starts a worker again. */
+  private disposed = false;
 
   constructor(private manifest = modelManifest()) {}
 
@@ -106,6 +108,7 @@ export class Recognizer {
 
   /** Load the model from the device cache. Never downloads. */
   load(): Promise<'webgpu' | 'wasm'> {
+    if (this.disposed) return Promise.reject(new RecognizerError('cancelled', 'Cancelled.'));
     if (this.loaded) return this.loaded;
     this.worker = this.start();
     const w = this.worker;
@@ -128,23 +131,28 @@ export class Recognizer {
 
   async embed(inputs: Float32Array[]): Promise<Float32Array[]> {
     await this.load();
+    const w = this.worker;
+    if (this.disposed || !w) throw new RecognizerError('cancelled', 'Cancelled.');
     const id = ++this.seq;
     return new Promise((resolve, reject) => {
       this.pending.set(id, { resolve, reject });
       const msg: WorkerIn = { type: 'embed', id, inputs, size: SPEC.size.width };
-      this.worker!.postMessage(msg, inputs.map((i) => i.buffer));
+      w.postMessage(msg, inputs.map((i) => i.buffer));
     });
   }
 
   /** Ranked label suggestions for a photo. */
   async suggest(photo: Blob, opts: { parts?: boolean } = {}): Promise<Ranked[]> {
+    if (this.disposed) throw new RecognizerError('cancelled', 'Cancelled.');
     const inputs = await photoInputs(photo, !!opts.parts);
     const embeddings = await this.embed(inputs);
+    if (this.disposed) throw new RecognizerError('cancelled', 'Cancelled.');
     return mergeRankings(embeddings.map((e) => scorer.rank(e, 8)), 6);
   }
 
   /** Stop any running work and free memory. */
   cancel() {
+    this.disposed = true;
     this.fail(new RecognizerError('cancelled', 'Cancelled.'));
   }
 }

@@ -73,9 +73,9 @@ describe('model download', () => {
     const ac = new AbortController();
     const calls: string[] = [];
     const caches = memCaches();
-    // Abort after the first file finished.
+    // Abort while the second file streams; the first one is complete and verified.
     const d = deps(fetcher({ [m.files[0].url]: A, [m.files[1].url]: B }, calls), caches);
-    const onProgress = (p: { file: string }) => { if (p.file === 'a.onnx') ac.abort(); };
+    const onProgress = (p: { file: string }) => { if (p.file === 'b.json') ac.abort(); };
     await expect(downloadModel(m, { signal: ac.signal, onProgress }, d)).rejects.toMatchObject({ code: 'aborted' });
     expect(await isInstalled(m, d)).toBe(false);
     calls.length = 0;
@@ -118,6 +118,23 @@ describe('model download', () => {
     const err = await downloadModel(m, {}, deps(fetcher({ [m.files[0].url]: A }), memCaches({ failPut: true }))).catch((e) => e);
     expect(err).toBeInstanceOf(DownloadError);
     expect(err.code).toBe('storage');
+  });
+
+  it('a cancel during the final verification still leaves the model not installed', async () => {
+    const m = await manifest();
+    const ac = new AbortController();
+    const d: Deps = { ...deps(fetcher({ [m.files[0].url]: A, [m.files[1].url]: B })), digest: async (b) => { if (b.byteLength === B.byteLength) ac.abort(); return sha256Hex(b); } };
+    await expect(downloadModel(m, { signal: ac.signal }, d)).rejects.toMatchObject({ code: 'aborted' });
+    expect(await isInstalled(m, d)).toBe(false);
+  });
+
+  it('starting a download removes older revisions of the same model', async () => {
+    const m = await manifest();
+    const caches = memCaches();
+    await caches.open('model-cache:test/model@old');
+    await caches.open('model-cache:other/model@x');
+    await downloadModel(m, {}, deps(fetcher({ [m.files[0].url]: A, [m.files[1].url]: B }), caches));
+    expect((await caches.keys()).sort()).toEqual([cacheName(m), 'model-cache:other/model@x'].sort());
   });
 
   it('removal deletes every revision; eviction looks like not installed', async () => {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { getFavorites, putEntry, recentItems } from '../../db/repo';
 import { buildEntry, makePortion } from '../../domain/portion';
 import { MEAL_SLOTS, type Food, type MealEntry, type MealSlot } from '../../domain/types';
@@ -74,6 +74,8 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
   const [parts, setParts] = useState(false);
   const [photoUsed, setPhotoUsed] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
+  const suggestRun = useRef(0);
+  const [lastReview, setLastReview] = useState<Extract<Step, { kind: 'review' }> | null>(null);
   const [Scanner, setScanner] = useState<ComponentType<BarcodeSheetProps> | null>(null);
   const [scanErr, setScanErr] = useState<string | null>(null);
   useEffect(() => {
@@ -114,15 +116,21 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
     if (!photo) return;
     setSuggestErr(null);
     setSuggesting(true);
+    ui.announce('Looking at your photo on this device');
+    const run = ++suggestRun.current;
     try {
       const rec = await getRecognizer();
       const ranked = await rec.suggest(photo, { parts });
       const [{ toCandidates }, { isUnsure }] = await Promise.all([import('../../vision/match'), import('../../vision/scoring')]);
+      if (run !== suggestRun.current) return; // cancelled meanwhile: ignore late results
       const candidates = toCandidates(ranked, state.foodsById, state.index);
-      setStep({ kind: 'review', candidates, unsure: isUnsure(ranked) || candidates.length === 0 });
+      const review = { kind: 'review' as const, candidates, unsure: isUnsure(ranked) || candidates.length === 0 };
+      setLastReview(review);
+      setStep(review);
+      ui.announce(review.unsure ? "Can't tell what this is. Search is available." : `${candidates.length} possible matches`);
     } catch (e) {
       const code = (e as { code?: string }).code;
-      if (code !== 'cancelled') {
+      if (code !== 'cancelled' && run === suggestRun.current) {
         setSuggestErr(
           code === 'missing'
             ? 'The suggestion model is no longer on this device. You can download it again, or search instead.'
@@ -136,11 +144,12 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
         }
       }
     } finally {
-      setSuggesting(false);
+      if (run === suggestRun.current) setSuggesting(false);
     }
   }
 
   async function cancelSuggest() {
+    suggestRun.current++;
     await resetRecognizer();
     setSuggesting(false);
   }
@@ -155,7 +164,14 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
   }
 
   const title = step.kind === 'portion' ? 'Amount' : step.kind === 'custom' ? 'New custom food' : step.kind === 'review' ? 'Photo suggestions' : 'Add food';
-  const back = step.kind === 'list' ? undefined : { label: 'Back to search', onClick: () => setStep({ kind: 'list' }) };
+  const back =
+    step.kind === 'list'
+      ? undefined
+      : step.kind === 'portion' && step.queue && lastReview
+        ? { label: 'Back to possible matches', onClick: () => setStep(lastReview) }
+        : step.kind === 'review'
+          ? { label: 'Back to photo', onClick: () => { setStep({ kind: 'list' }); setTab('photo'); } }
+          : { label: 'Back to search', onClick: () => setStep({ kind: 'list' }) };
 
   const body = () => {
     if (step.kind === 'portion') {
@@ -172,7 +188,7 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
           />
         );
       }
-      return <PortionView food={step.food} initialMeal={meal} photo={photo} onSaved={props.onClose} />;
+      return <PortionView food={step.food} initialMeal={meal} photo={photoUsed ? null : photo} onSaved={props.onClose} />;
     }
     if (step.kind === 'review') {
       return (
@@ -337,7 +353,7 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
               {state.settings.photoSuggestions && model.kind === 'ready' ? (
                 photo ? (
                   suggesting ? (
-                    <div class="stack" aria-live="polite">
+                    <div class="stack">
                       <p class="notice" aria-busy="true"><Icon name="clock" size={18} /> Looking at your photo on this device…</p>
                       <button type="button" class="btn btn-secondary" onClick={() => void cancelSuggest()}>Cancel</button>
                     </div>

@@ -20,8 +20,17 @@ export interface ModelDeps {
   supported(): string | null; // null = supported, else reason
 }
 
-const defaultSupported = () => {
+// Smallest module using a SIMD instruction (v128). The runtime needs WebAssembly SIMD
+// (Safari 16.4+), so older iOS must never download 90 MB it cannot run.
+const SIMD_PROBE = new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]);
+
+export const defaultSupported = () => {
   if (typeof WebAssembly === 'undefined') return 'This browser cannot run the suggestion engine (no WebAssembly).';
+  try {
+    if (!WebAssembly.validate(SIMD_PROBE)) return 'It needs a newer browser (iOS 16.4 or later).';
+  } catch {
+    return 'It needs a newer browser (iOS 16.4 or later).';
+  }
   if (typeof caches === 'undefined') return 'This browser cannot store files for offline use.';
   if (typeof Worker === 'undefined') return 'This browser cannot run background work.';
   return null;

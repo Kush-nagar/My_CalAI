@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { Icon } from '../icons';
 import { useApp } from '../store';
 import { useUi } from '../ui';
@@ -20,6 +20,29 @@ export function ModelPanel() {
   const [size, setSize] = useState<number | null>(null);
   const [free, setFree] = useState<number | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const dlHeading = useRef<HTMLHeadingElement>(null);
+  const progressRef = useRef<HTMLProgressElement>(null);
+  const milestone = useRef(0);
+
+  // Screen readers: announce progress at 25% steps, not on every chunk.
+  useEffect(() => {
+    if (st.kind !== 'downloading' || !st.total) {
+      milestone.current = 0;
+      return;
+    }
+    const q = Math.floor((st.loaded / st.total) * 4);
+    if (q > milestone.current && q < 4) ui.announce(`Download ${q * 25}% done`);
+    milestone.current = Math.max(milestone.current, q);
+  }, [st]);
+  useEffect(() => {
+    if (st.kind === 'ready' && milestone.current) ui.announce('Photo suggestions are ready');
+  }, [st.kind]);
+  useEffect(() => {
+    if (confirming) dlHeading.current?.focus();
+  }, [confirming]);
+  useEffect(() => {
+    if (st.kind === 'downloading') progressRef.current?.focus();
+  }, [st.kind]);
 
   useEffect(() => {
     modelDownloadBytes().then(setSize, () => setSize(null));
@@ -57,9 +80,9 @@ export function ModelPanel() {
   if (st.kind === 'downloading') {
     const pct = st.total ? Math.floor((st.loaded / st.total) * 100) : 0;
     return (
-      <div class="stack model-dl" aria-live="polite">
+      <div class="stack model-dl">
         <label for="model-progress"><strong>Downloading the suggestion model</strong></label>
-        <progress id="model-progress" max={st.total} value={st.loaded}>{pct}%</progress>
+        <progress id="model-progress" ref={progressRef} tabIndex={-1} max={st.total} value={st.loaded}>{pct}%</progress>
         <p class="hint num">
           {formatMB(st.loaded)} of {formatMB(st.total)} ({pct}%). Keep Thali open until it finishes. You can keep logging meanwhile.
         </p>
@@ -70,6 +93,21 @@ export function ModelPanel() {
           }}>
           Cancel download
         </button>
+      </div>
+    );
+  }
+
+  if (st.kind === 'ready' && !enabled) {
+    return (
+      <div class="stack">
+        <p class="notice">
+          <Icon name="info" size={18} />
+          <span>The suggestion model ({sizeText}) is on this device but photo suggestions are turned off.</span>
+        </p>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" onClick={() => void actions.updateSettings({ photoSuggestions: true })}>Turn on</button>
+          <button type="button" class="btn btn-secondary" onClick={() => void remove()}><Icon name="trash" size={18} /> Remove model</button>
+        </div>
       </div>
     );
   }
@@ -95,13 +133,16 @@ export function ModelPanel() {
     <div class="stack">
       {failed ? (
         <p class="error" role="alert">
-          <Icon name="alert" size={16} /> Couldn't finish downloading: {failed} Verified files are kept so a retry continues where it stopped.
+          <Icon name="alert" size={16} /> Couldn't finish downloading: {failed} Files that finished downloading are kept; the rest starts again when you retry.
         </p>
       ) : null}
       {missing ? (
         <p class="notice warn">
           <Icon name="info" size={18} />
-          <span>The suggestion model is no longer on this device. iPhone can remove website data when storage is low. Logging and photos still work.</span>
+          <span>
+            The suggestion model isn't fully on this device. This happens after an app update, an unfinished download, restoring a
+            backup on another phone, or when iPhone clears website data. Logging and photos still work.
+          </span>
         </p>
       ) : null}
       {!confirming ? (
@@ -120,7 +161,7 @@ export function ModelPanel() {
         </>
       ) : (
         <div class="card-inner stack" role="group" aria-labelledby="dl-h">
-          <h3 id="dl-h">Download {sizeText}?</h3>
+          <h3 id="dl-h" ref={dlHeading} tabIndex={-1}>Download {sizeText}?</h3>
           <ul class="bullets">
             <li>One-time download of {sizeText}, stored on this device{free !== null ? ` (about ${formatMB(free)} available to this app)` : ''}. Wi-Fi recommended.</li>
             <li>The files come from this app's own website. Your photos and diary are never sent anywhere.</li>

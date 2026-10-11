@@ -118,7 +118,7 @@ test('evicted model falls back gracefully', async ({ page }) => {
   );
   await page.reload();
   await page.getByRole('navigation', { name: 'Main' }).getByText('Settings').click();
-  await expect(page.getByText(/no longer on this device/)).toBeVisible();
+  await expect(page.getByText(/isn't fully on this device/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Download again' })).toBeVisible();
   await page.locator('.add-fab').click();
   await page.getByRole('tab', { name: 'Photo' }).click();

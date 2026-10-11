@@ -85,6 +85,8 @@ export async function downloadModel(
   if (!deps.caches) throw new DownloadError('storage', 'This browser cannot store files for offline use.');
   const total = totalBytes(m);
   let done = 0;
+  // Drop other revisions (older model/runtime) so updates never leave orphaned copies behind.
+  for (const k of await deps.caches.keys()) if (k.startsWith(`model-cache:${m.id}@`) && k !== cacheName(m)) await deps.caches.delete(k);
   const cache = await deps.caches.open(cacheName(m));
   for (const f of m.files) {
     if (await cache.match(f.url)) {
@@ -100,16 +102,17 @@ export async function downloadModel(
       throw new DownloadError('network', `Network error while downloading ${f.path}.`);
     }
     if (!res.ok || !res.body) throw new DownloadError('http', `Server returned ${res.status} for ${f.path}.`);
-    const chunks: Uint8Array[] = [];
+    // Size is known: write chunks straight into one buffer (one copy of the file in memory).
+    const buf = new Uint8Array(f.bytes);
     let got = 0;
     const reader = res.body.getReader();
     try {
       for (;;) {
         const { done: end, value } = await reader.read();
         if (end) break;
+        if (got + value.byteLength > f.bytes) throw new DownloadError('size', `${f.path} is larger than expected.`);
+        buf.set(value, got);
         got += value.byteLength;
-        if (got > f.bytes) throw new DownloadError('size', `${f.path} is larger than expected.`);
-        chunks.push(value);
         opts.onProgress?.({ loaded: done + got, total, file: f.path });
       }
     } catch (e) {
@@ -118,13 +121,8 @@ export async function downloadModel(
       throw new DownloadError('network', `Connection lost while downloading ${f.path}.`);
     }
     if (got !== f.bytes) throw new DownloadError('size', `${f.path} is incomplete (${got} of ${f.bytes} bytes).`);
-    const buf = new Uint8Array(got);
-    let o = 0;
-    for (const c of chunks) {
-      buf.set(c, o);
-      o += c.byteLength;
-    }
     if ((await deps.digest(buf.buffer)) !== f.sha256) throw new DownloadError('checksum', `${f.path} failed its integrity check.`);
+    if (opts.signal?.aborted) throw new DownloadError('aborted', 'Download cancelled.');
     try {
       await cache.put(f.url, new Response(buf, { headers: { 'content-type': 'application/octet-stream', 'content-length': String(got) } }));
     } catch {
