@@ -1,0 +1,39 @@
+{
+  "_comment": "SYNTHETIC test fixture for seed-lib unit tests. Numbers are made up to exercise code paths; they are NOT USDA values and are never shipped.",
+  "retrievedAt": "2000-01-01T00:00:00.000Z",
+  "source": "fixture",
+  "license": "fixture",
+  "datasets": [
+    { "kind": "sr_legacy", "file": "fixture_sr.zip", "url": "about:blank" },
+    { "kind": "foundation", "file": "fixture_foundation.zip", "url": "about:blank" },
+    { "kind": "survey", "file": "fixture_survey.zip", "url": "about:blank" }
+  ],
+  "foods": [
+    {
+      "fdcId": 1, "dataset": "sr_legacy", "dataType": "sr_legacy_food", "desc": "Test grain, raw", "cat": "Test", "published": "2000-01-01",
+      "n": { "energy_kcal": 300, "protein_g": 10, "carb_g": 60, "fat_g": 2, "fiber_g": 0, "sodium_mg": 5 },
+      "portions": [
+        { "label": "1 cup", "g": 200 },
+        { "label": "1 cup", "g": 210 },
+        { "label": "Quantity not specified", "g": 50 },
+        { "label": "1", "g": 7 },
+        { "label": "1 tbsp", "g": 0 }
+      ]
+    },
+    {
+      "fdcId": 2, "dataset": "foundation", "dataType": "foundation_food", "desc": "Test pulse, dry", "cat": "Test", "published": "2001-01-01",
+      "n": { "energy_kcal_atwater_specific": 340, "energy_kcal_atwater_general": 350, "protein_g": 22, "carb_g": 60, "fat_g": 1.5 },
+      "portions": []
+    },
+    {
+      "fdcId": 3, "dataset": "foundation", "dataType": "foundation_food", "desc": "Test pulse, dry", "cat": "Test", "published": "2003-01-01",
+      "n": { "energy_kcal_atwater_general": 355, "protein_g": 23, "carb_g": 59, "fat_g": 1.4 },
+      "portions": [{ "label": "1 cup", "g": 190 }]
+    },
+    {
+      "fdcId": 4, "dataset": "survey", "dataType": "survey_fndds_food", "desc": "Test curry", "cat": "Test dishes", "foodCode": "99999999", "published": "2002-01-01",
+      "n": { "energy_kcal": 120, "protein_g": 5, "carb_g": 10, "fat_g": 7, "fiber_g": 2, "sugars_g": 1, "satfat_g": 1, "sodium_mg": 300, "potassium_mg": 200, "calcium_mg": 30, "iron_mg": 1, "zinc_mg": 0.5, "vitc_mg": 3, "folate_ug": 20, "vitb12_ug": 0 },
+      "portions": [{ "label": "1 cup", "g": 240 }, { "label": "1 cup", "g": 250 }]
+    }
+  ]
+}
