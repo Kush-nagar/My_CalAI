@@ -19,6 +19,9 @@ jobs:
       - run: node scripts/packs/build-packs.mjs "$RUNNER_TEMP/packs"
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+      - run: npm ci
+      - name: Index real packs (timing, memory, search quality)
+        run: npx vitest run src/packs/real.test.ts 2>&1 | tee scripts/packs/real-test.log
       - name: Sample rows
         run: for f in public/packs/*/00.txt; do echo "== $f"; sed -n '1,4p' "$f"; done; du -sh public/packs/*
       - name: Commit stats
@@ -27,7 +30,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p scripts/packs/samples
           for d in public/packs/*/; do id=$(basename "$d"); [ -f "$d/00.txt" ] && awk 'NR==1 || NR%4000==2' "$d/00.txt" | head -12 > "scripts/packs/samples/$id.txt"; done
-          git add scripts/packs/last-build.json scripts/packs/samples
+          git add scripts/packs/last-build.json scripts/packs/samples scripts/packs/real-test.log
           git diff --cached --quiet || git commit -m "packs: build stats"
           git checkout -- public/packs
           git pull --rebase
