@@ -114,3 +114,16 @@ describe('search', () => {
     expect(skeleton('poha')).not.toBe(skeleton('pova'));
   });
 });
+
+describe('quick add', () => {
+  it('logs entered values as-is and keeps blanks unknown', async () => {
+    const { buildQuickEntry } = await import('./portion');
+    const e = buildQuickEntry({ name: 'Protein banana smoothie', values: { energy_kcal: 320, protein_g: 28, carb_g: null }, meal: 'breakfast', localDate: '2026-10-13' });
+    expect(e.nutrients.values.energy_kcal).toBe(320);
+    expect(e.nutrients.values.protein_g).toBe(28);
+    expect(e.nutrients.incomplete).toContain('carb_g');
+    expect(e.portion.servingsOnly).toBe(true);
+    expect(() => buildQuickEntry({ name: 'x', values: {}, meal: 'lunch', localDate: '2026-10-13' })).toThrow();
+    expect(() => buildQuickEntry({ name: 'x', values: { energy_kcal: -1 }, meal: 'lunch', localDate: '2026-10-13' })).toThrow();
+  });
+});

@@ -50,7 +50,7 @@ export type Ledger = IDBPDatabase<LedgerDB>;
 
 export async function getSettings(db: Ledger): Promise<Settings> {
   const s = (await db.get('kv', 'settings')) as Partial<Settings> | undefined;
-  return { ...DEFAULT_SETTINGS, ...(s ?? {}) };
+  return { ...DEFAULT_SETTINGS, ...(s ?? {}), goals: { ...DEFAULT_SETTINGS.goals, ...(s?.goals ?? {}) } };
 }
 
 export async function saveSettings(db: Ledger, s: Settings): Promise<void> {
