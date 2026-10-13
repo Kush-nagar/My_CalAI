@@ -22,7 +22,6 @@ const NUM_COLS: { col: number; code: NutrientCode }[] = [
   { col: 3, code: 'energy_kcal' }, { col: 4, code: 'protein_g' }, { col: 5, code: 'carb_g' }, { col: 6, code: 'fat_g' },
   { col: 7, code: 'fiber_g' }, { col: 8, code: 'sugars_g' }, { col: 9, code: 'satfat_g' }, { col: 10, code: 'sodium_mg' },
 ];
-const NN = NUM_COLS.length;
 
 export interface PackRow {
   pack: string;
@@ -36,147 +35,160 @@ export interface PackRow {
   ref: string;
 }
 
-/** Compact columnar store for hundreds of thousands of products. */
+/**
+ * Memory-lean store for hundreds of thousands of products (an iPhone constraint). Each shard is kept
+ * as its raw text plus a same-length folded copy for matching (lowercase, accents removed), with
+ * line offsets. Fields are parsed only for rows that are returned. Barcodes live in sorted typed arrays.
+ */
+interface Shard {
+  pack: string;
+  raw: string;
+  low: string;
+  starts: Uint32Array; // offset of each data line
+  base: number; // global row index of the first line
+}
+
+/** Length-preserving fold: lowercase + strip common Latin accents, so offsets stay valid. */
+function fold(raw: string): string {
+  let low = raw.toLowerCase();
+  if (low.length !== raw.length) {
+    // Rare characters change length when lowercased: fold them one by one instead.
+    low = Array.from(raw, (c) => (c.toLowerCase().length === c.length ? c.toLowerCase() : c)).join('');
+  }
+  return low.replace(/[\u00C0-\u024F]/g, (c) => {
+    const base = c.normalize('NFKD').replace(/\p{M}/gu, '');
+    return base.length === 1 ? base : c;
+  });
+}
+
 export class PackIndex {
-  private names: string[] = [];
-  private brands: string[] = [];
-  private gtins: string[] = [];
-  private refs: string[] = [];
-  private servLabels: string[] = [];
-  private packOf: string[] = [];
-  private nums: Float32Array = new Float32Array(0);
-  private serv: Float32Array = new Float32Array(0);
-  private basis: Uint8Array = new Uint8Array(0);
-  private hay = '';
-  private starts: Uint32Array = new Uint32Array(0);
-  private byGtin = new Map<string, number>();
-  private pending: { pack: string; lines: string[] }[] = [];
+  private shards: Shard[] = [];
+  private total = 0;
+  private gtinKeys = new Float64Array(0);
+  private gtinRows = new Uint32Array(0);
+  private pendingGtins: [number, number][] = [];
 
   get size() {
-    return this.names.length;
+    return this.total;
   }
 
-  /** Add one shard's text. Call build() after the last shard. Malformed lines are skipped. */
+  /** Add one shard's text. Call build() after the last shard. Malformed lines are skipped at read time. */
   addShard(pack: string, text: string): number {
-    const lines = text.split('\n');
-    const header = lines.shift()?.split('\t') ?? [];
+    const nl = text.indexOf('\n');
+    const header = (nl === -1 ? text : text.slice(0, nl)).split('\t');
     if (COLUMNS.some((c, i) => header[i] !== c)) throw new Error('Pack file has an unexpected format');
-    const ok = lines.filter((l) => l.length > 0);
-    this.pending.push({ pack, lines: ok });
-    return ok.length;
+    const starts: number[] = [];
+    let pos = nl + 1;
+    while (pos > 0 && pos < text.length) {
+      const end = text.indexOf('\n', pos);
+      const e = end === -1 ? text.length : end;
+      if (e > pos) {
+        // A valid row has every column; cheap check: at least 14 tabs before the line end.
+        let tabs = 0;
+        for (let k = text.indexOf('\t', pos); k !== -1 && k < e; k = text.indexOf('\t', k + 1)) tabs++;
+        if (tabs >= COLUMNS.length - 1 && text.charCodeAt(text.indexOf('\t', pos) + 1) !== 9) {
+          starts.push(pos);
+          const gt = text.slice(pos, text.indexOf('\t', pos));
+          const g = normGtin(gt);
+          if (g && g.length <= 15) this.pendingGtins.push([Number(g), this.total + starts.length - 1]);
+        }
+      }
+      pos = end === -1 ? -1 : end + 1;
+    }
+    this.shards.push({ pack, raw: text, low: fold(text), starts: Uint32Array.from(starts), base: this.total });
+    this.total += starts.length;
+    return starts.length;
   }
 
   build() {
-    const total = this.names.length + this.pending.reduce((s, p) => s + p.lines.length, 0);
-    const nums = new Float32Array(total * NN);
-    nums.set(this.nums);
-    const serv = new Float32Array(total);
-    serv.set(this.serv);
-    const basis = new Uint8Array(total);
-    basis.set(this.basis);
-    const hayParts: string[] = this.hay ? [this.hay] : [];
-    for (const { pack, lines } of this.pending) {
-      for (const line of lines) {
-        const c = line.split('\t');
-        if (c.length < COLUMNS.length || !c[1]) continue;
-        const i = this.names.length;
-        this.names.push(c[1]);
-        this.brands.push(c[2]);
-        this.gtins.push(c[0]);
-        this.refs.push(c[14]);
-        this.servLabels.push(c[13]);
-        this.packOf.push(pack);
-        for (let k = 0; k < NN; k++) {
-          const v = c[NUM_COLS[k].col];
-          nums[i * NN + k] = v === '' ? NaN : Number(v);
-        }
-        serv[i] = c[12] === '' ? NaN : Number(c[12]);
-        basis[i] = c[11] === 'ml' ? 1 : 0;
-        if (c[0]) {
-          const g = normGtin(c[0]);
-          if (g && !this.byGtin.has(g)) this.byGtin.set(g, i);
-        }
-        hayParts.push(normalize(`${c[1]} ${c[2]}`));
-      }
+    const all: [number, number][] = [];
+    for (let i = 0; i < this.gtinKeys.length; i++) all.push([this.gtinKeys[i], this.gtinRows[i]]);
+    for (const x of this.pendingGtins) all.push(x);
+    this.pendingGtins = [];
+    // First occurrence wins for duplicate barcodes across packs.
+    all.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const keys: number[] = [];
+    const rows: number[] = [];
+    for (const [k, r] of all) if (keys[keys.length - 1] !== k) { keys.push(k); rows.push(r); }
+    this.gtinKeys = Float64Array.from(keys);
+    this.gtinRows = Uint32Array.from(rows);
+  }
+
+  private locate(i: number): { sh: Shard; li: number } {
+    let lo = 0;
+    let hi = this.shards.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (this.shards[mid].base <= i) lo = mid;
+      else hi = mid - 1;
     }
-    this.pending = [];
-    const n = this.names.length;
-    this.nums = nums.subarray(0, n * NN);
-    this.serv = serv.subarray(0, n);
-    this.basis = basis.subarray(0, n);
-    this.hay = hayParts.join('\n');
-    // Line start offsets for mapping a match position back to a row.
-    const starts = new Uint32Array(n);
-    let pos = 0;
-    for (let i = 0; i < n; i++) {
-      starts[i] = pos;
-      pos = this.hay.indexOf('\n', pos) + 1;
-      if (pos === 0) pos = this.hay.length;
-    }
-    this.starts = starts;
+    const sh = this.shards[lo];
+    return { sh, li: i - sh.base };
+  }
+
+  private bounds(sh: Shard, li: number): [number, number] {
+    const s0 = sh.starts[li];
+    const e = sh.raw.indexOf('\n', s0);
+    return [s0, e === -1 ? sh.raw.length : e];
   }
 
   row(i: number): PackRow {
-    const values: (number | null)[] = [];
-    for (let k = 0; k < NN; k++) {
-      const v = this.nums[i * NN + k];
-      // Stored as float32; source data has ≤4 significant digits, so this restores the exact value.
-      values.push(Number.isNaN(v) ? null : Number(v.toPrecision(5)));
-    }
-    const s = this.serv[i];
-    const sq = Number.isNaN(s) || !(s > 0) ? null : Number(s.toPrecision(5));
+    const { sh, li } = this.locate(i);
+    const [s0, e] = this.bounds(sh, li);
+    const c = sh.raw.slice(s0, e).split('\t');
+    const n = (v: string) => (v === '' || v === undefined ? null : Number(v));
+    const values = NUM_COLS.map(({ col }) => {
+      const v = n(c[col]);
+      return v === null || !Number.isFinite(v) ? null : v;
+    });
+    const sq = n(c[12]);
     return {
-      pack: this.packOf[i],
-      gtin: this.gtins[i],
-      name: this.names[i],
-      brand: this.brands[i],
+      pack: sh.pack,
+      gtin: c[0],
+      name: c[1],
+      brand: c[2],
       values,
-      basis: this.basis[i] ? 'ml' : 'g',
-      servingQty: sq,
-      servingLabel: this.servLabels[i],
-      ref: this.refs[i],
+      basis: c[11] === 'ml' ? 'ml' : 'g',
+      servingQty: sq !== null && sq > 0 ? sq : null,
+      servingLabel: c[13] ?? '',
+      ref: c[14] ?? '',
     };
   }
 
-  private rowAt(pos: number): number {
-    let lo = 0;
-    let hi = this.starts.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi + 1) >> 1;
-      if (this.starts[mid] <= pos) lo = mid;
-      else hi = mid - 1;
-    }
-    return lo;
-  }
-
-  private line(i: number): string {
-    const end = i + 1 < this.starts.length ? this.starts[i + 1] - 1 : this.hay.length;
-    return this.hay.slice(this.starts[i], end);
-  }
-
-  /** Every query word must appear; ranking prefers whole-word and leading matches, then shorter names. */
+  /** Every query word must appear in name or brand; ranking prefers whole-word and leading matches, then shorter names. */
   search(query: string, limit = 30): PackRow[] {
     const words = normalize(query).split(' ').filter((w) => w.length > 0);
-    if (!words.length || !this.hay) return [];
+    if (!words.length) return [];
     const anchor = words.reduce((a, b) => (b.length > a.length ? b : a));
-    const seen = new Set<number>();
     const scored: { i: number; s: number }[] = [];
-    let pos = this.hay.indexOf(anchor);
-    while (pos !== -1 && scored.length < 4000) {
-      const i = this.rowAt(pos);
-      if (!seen.has(i)) {
-        seen.add(i);
-        const ln = this.line(i);
-        if (words.every((w) => ln.includes(w))) {
-          const toks = ln.split(' ');
-          let s = 0;
-          for (const w of words) s += toks.includes(w) ? 3 : toks.some((t) => t.startsWith(w)) ? 2 : 1;
-          if (ln.startsWith(words.join(' '))) s += 3;
-          s -= Math.min(3, ln.length / 40);
-          scored.push({ i, s });
+    for (const sh of this.shards) {
+      let pos = sh.low.indexOf(anchor);
+      while (pos !== -1 && scored.length < 4000) {
+        // Line containing pos.
+        let lo = 0;
+        let hi = sh.starts.length - 1;
+        while (lo < hi) {
+          const mid = (lo + hi + 1) >> 1;
+          if (sh.starts[mid] <= pos) lo = mid;
+          else hi = mid - 1;
         }
+        const [s0, e] = this.bounds(sh, lo);
+        const t1 = sh.low.indexOf('\t', s0);
+        const t2 = sh.low.indexOf('\t', t1 + 1);
+        const t3 = sh.low.indexOf('\t', t2 + 1);
+        if (pos > t1 && pos < t3) {
+          const text = sh.low.slice(t1 + 1, t3).replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+          if (words.every((w) => text.includes(w))) {
+            const toks = text.split(' ');
+            let sc = 0;
+            for (const w of words) sc += toks.includes(w) ? 3 : toks.some((t) => t.startsWith(w)) ? 2 : 1;
+            if (text.startsWith(words.join(' '))) sc += 3;
+            sc -= Math.min(3, (t2 - t1) / 40);
+            scored.push({ i: sh.base + lo, s: sc });
+          }
+        }
+        pos = sh.low.indexOf(anchor, e);
       }
-      pos = this.hay.indexOf(anchor, this.starts[i] + (this.line(i).length || 1));
     }
     scored.sort((a, b) => b.s - a.s);
     return scored.slice(0, limit).map((x) => this.row(x.i));
@@ -185,9 +197,18 @@ export class PackIndex {
   /** Barcode lookup tolerant of UPC/EAN leading-zero differences. */
   byBarcode(code: string): PackRow | null {
     const g = normGtin(code);
-    if (!g) return null;
-    const i = this.byGtin.get(g);
-    return i === undefined ? null : this.row(i);
+    if (!g || g.length > 15) return null;
+    const k = Number(g);
+    let lo = 0;
+    let hi = this.gtinKeys.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const v = this.gtinKeys[mid];
+      if (v === k) return this.row(this.gtinRows[mid]);
+      if (v < k) lo = mid + 1;
+      else hi = mid - 1;
+    }
+    return null;
   }
 }
 

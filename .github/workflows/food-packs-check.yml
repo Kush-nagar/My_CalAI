@@ -5,7 +5,7 @@ name: Food packs check
 on:
   workflow_dispatch:
   push:
-    paths: ['scripts/packs/**', '!scripts/packs/last-build.json', '.github/workflows/food-packs-check.yml']
+    paths: ['scripts/packs/**', 'src/packs/**', '!scripts/packs/last-build.json', '!scripts/packs/real-test.log', '!scripts/packs/samples/**', '.github/workflows/food-packs-check.yml']
 permissions:
   contents: write
 jobs:
