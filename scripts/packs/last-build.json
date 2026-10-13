@@ -1,0 +1,28 @@
+{
+ "at": "2026-10-13T21:02:15.221Z",
+ "stats": {
+  "usda": 431128,
+  "offIndia": 1718,
+  "offWorld": 250000
+ },
+ "packs": [
+  {
+   "id": "usda-branded",
+   "rows": 431128,
+   "bytes": 53599925,
+   "files": 11
+  },
+  {
+   "id": "off-india",
+   "rows": 1718,
+   "bytes": 180029,
+   "files": 1
+  },
+  {
+   "id": "off-world",
+   "rows": 250000,
+   "bytes": 25702651,
+   "files": 7
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/home/runner/work/My_CalAI/My_CalAI[39m
+
+[90mstdout[2m | src/packs/real.test.ts[2m > [22m[2mreal food packs[2m > [22m[2mbuilds, searches and resolves barcodes on the full data
+[22m[39mrows 682846, build 1024 ms, heap +317 MB
+cheerios                 46.3 ms  Cheerios — General Mills | Cheerios | Cheerios — Nestlé | Cheerios — general mills | Cheerios — Nestlé
+chobani greek yogurt     51.3 ms  Chobani, Greek Yogurt, Raspberry & Dark Chocolate, | Greek Yogurt — Chobani | Greek Yogurt — Chobani | Greek Yogurt — Chobani | Greek Yogurt — Chobani
+protein bar              77.1 ms  Protein Bar — Met-Rx | Protein Bar — Nugo | Protein Bar — Met-Rx | Protein Bar — Supreme Protein | Protein Bar — Marathon
+coca cola                31.6 ms  coca cola — Coca-Cola | coca cola — Coca-Cola | coca cola — Coke | coca cola | coca cola
+amul butter              54.3 ms  Amul butter scotch ice cream | Butter School Pack — Amul | Butter School Pack — Amul | Protein Buttermilk — Amul | Protein Buttermilk — Amul
+maggi noodles            56.1 ms  Maggi Noodles Curry | Maggi noodles masala — Nestle | Maggi noodles masala — Nestle | Maggi Noodles Chicken 5 Pack — Nestlé | Beef noodles — Maggi
+nutella                  49.9 ms  nutella — Ferrero | Nutella | nutella — Ferrero | nutella | nutella — Ferrero
+oreo                     33.5 ms  oreo | oreo | oreo | Oreo | Oreo
+quest bar                 5.8 ms  Apple Pie — Quest Bar | Protein Bar, Rocky Road — Quest | Protein Bar, Mixed Berry — Quest Bar | Quest Protein Cookie bar | S'Mores Protein Bar, Smores — Quest
+fairlife milk            43.9 ms  Fairlife Milk, Ultra- Filtered | Fairlife Milk Ultra- Filtered Reduced Fat Chocolat | ultrafiltered WHOLE MILK — fairlife | Partially Skimmed Chocolate Milk — fairlife | ultrafiltered partly skimmed milk — fairlife
+
+ [32m✓[39m src/packs/real.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 1536[2mms[22m[39m
+   [33m[2m✓[22m[39m real food packs[2m > [22mbuilds, searches and resolves barcodes on the full data [33m 1535[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 21:02:20
+[2m   Duration [22m 1.81s[2m (transform 58ms, setup 0ms, collect 68ms, tests 1.54s, environment 0ms, prepare 49ms)[22m
+

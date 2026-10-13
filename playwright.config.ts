@@ -14,7 +14,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } } }],
   webServer: {
-    command: 'npm run build && npx vite preview --port 4173 --strictPort',
+    command: 'npm run build && node scripts/packs/fixture.mjs dist && npx vite preview --port 4173 --strictPort',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

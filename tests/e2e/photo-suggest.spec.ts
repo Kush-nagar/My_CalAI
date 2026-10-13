@@ -47,7 +47,7 @@ test('opt-in download, offline suggestions, confirm before logging, removal fall
   await page.getByRole('button', { name: 'Set up photo suggestions' }).click();
   await expect(page.getByRole('heading', { name: /Download \d+ MB\?/ })).toBeVisible();
   expect(requests.some((u) => /\.onnx/.test(u))).toBe(false);
-  await page.getByRole('button', { name: /^Download \d+ MB$/ }).click();
+  await page.locator('section[aria-labelledby="s-photo"]').getByRole('button', { name: /^Download \d+ MB$/ }).click();
   await expect(page.getByText(/Photo suggestions are ready and work offline/)).toBeVisible({ timeout: 120_000 });
   // Only same-origin requests for the model.
   const origin = new URL(page.url()).origin;

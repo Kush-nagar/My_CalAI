@@ -40,7 +40,10 @@ installed taste/UI skill (`design-taste-frontend` / `taste-ui`) for all frontend
   streaks, scores, body comparison or exercise-to-earn-food; calories hidden by default; neutral
   education only.
 - Coverage is worldwide: curated Indian foods (`seed/foods.json`) + every other USDA FDC food
-  (`seed/global.json`, built by `scripts/data/build-global.mjs`), quick add, recipes, OFF barcodes.
+  (`seed/global.json`, built by `scripts/data/build-global.mjs`), quick add, recipes, OFF barcodes,
+  plus opt-in offline food packs (USDA Branded CC0, Open Food Facts ODbL) built at deploy by
+  `scripts/packs/`, served same-origin from `packs/` (never precached) and searched in a worker.
+  NCCDB and MyFitnessPal data are not used (paid/proprietary licences).
 - No Cal AI branding, names, graphics or layouts.
 
 ## Architecture
