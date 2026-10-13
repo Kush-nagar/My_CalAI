@@ -14,6 +14,8 @@ export function PortionView(props: {
   food: Food;
   initialMeal: MealSlot;
   photo?: Blob | null;
+  /** Set when this food came from photo suggestions: no default amount, step counter, skip. */
+  suggested?: { pos: number; total: number; onSkip(): void };
   onSaved(entry: MealEntry): void;
 }) {
   const { state, actions } = useApp();
@@ -21,7 +23,8 @@ export function PortionView(props: {
   const { food } = props;
   const opts = useMemo(() => unitOptions(food), [food]);
   const first = opts.find((o) => o.unit !== 'g');
-  const [qty, setQty] = useState(first ? '1' : '100');
+  // From a photo, never pre-fill an amount: the photo says nothing reliable about portion size.
+  const [qty, setQty] = useState(props.suggested ? '' : first ? '1' : '100');
   const [unit, setUnit] = useState((first ?? opts[0])?.unit ?? 'g');
   const [meal, setMeal] = useState<MealSlot>(props.initialMeal);
   const [estimated, setEstimated] = useState(false);
@@ -85,6 +88,15 @@ export function PortionView(props: {
   const s = food.source;
   return (
     <div class="portion">
+      {props.suggested ? (
+        <p class="notice">
+          <Icon name="camera" size={18} />
+          <span>
+            {props.suggested.total > 1 ? <strong>Food {props.suggested.pos} of {props.suggested.total}. </strong> : null}
+            Name suggested from your photo. Check it is right and enter the amount you ate. Oil and hidden ingredients aren't known.
+          </span>
+        </p>
+      ) : null}
       <div class="food-head">
         <div>
           <h3 class="food-name">{food.name}</h3>
@@ -169,6 +181,11 @@ export function PortionView(props: {
         <button type="button" class="btn btn-primary btn-block" onClick={save} disabled={saving}>
           {saving ? 'Saving…' : `Add to ${mealLabel(meal)}`}
         </button>
+        {props.suggested ? (
+          <button type="button" class="btn btn-secondary btn-block" onClick={props.suggested.onSkip} disabled={saving}>
+            {props.suggested.pos < props.suggested.total ? 'Skip this food' : 'Skip and finish'}
+          </button>
+        ) : null}
       </div>
     </div>
   );

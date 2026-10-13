@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { getFavorites, putEntry, recentItems } from '../../db/repo';
 import { buildEntry, makePortion } from '../../domain/portion';
 import { MEAL_SLOTS, type Food, type MealEntry, type MealSlot } from '../../domain/types';
-import { Segmented, Sheet, useObjectUrl } from '../components';
+import { Segmented, Sheet, Switch, useObjectUrl } from '../components';
 import { Icon, type IconName } from '../icons';
 import { foodFromEntry, formatNutrient, mealLabel, portionLabel } from '../helpers';
 import { caloriesVisible, useApp } from '../store';
@@ -12,6 +12,11 @@ import type { BarcodeSheetProps } from '../barcode/BarcodeSheet';
 import { CustomFoodForm } from '../screens/CustomFoodForm';
 import { FoodRow } from './FoodRow';
 import { PortionView } from './PortionView';
+import type { Candidate } from '../../vision/match';
+import { ModelPanel } from '../vision/ModelPanel';
+import { SuggestionReview } from '../vision/SuggestionReview';
+import { refreshModelStatus, useModelStatus } from '../vision/model';
+import { getRecognizer, resetRecognizer } from '../vision/suggest';
 
 type Tab = 'search' | 'recent' | 'favs' | 'barcode' | 'photo';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
@@ -22,7 +27,11 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'photo', label: 'Photo', icon: 'camera' },
 ];
 
-type Step = { kind: 'list' } | { kind: 'portion'; food: Food } | { kind: 'custom'; name?: string; barcode?: string };
+type Step =
+  | { kind: 'list' }
+  | { kind: 'portion'; food: Food; queue?: Food[]; pos?: number }
+  | { kind: 'custom'; name?: string; barcode?: string }
+  | { kind: 'review'; candidates: Candidate[]; unsure: boolean };
 
 /**
  * Re-encode a photo as a downscaled JPEG. Re-encoding always happens because it strips EXIF
@@ -59,6 +68,14 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [relogError, setRelogError] = useState<string | null>(null);
   const photoUrl = useObjectUrl(photo);
+  const model = useModelStatus();
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestErr, setSuggestErr] = useState<string | null>(null);
+  const [parts, setParts] = useState(false);
+  const [photoUsed, setPhotoUsed] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const suggestRun = useRef(0);
+  const [lastReview, setLastReview] = useState<Extract<Step, { kind: 'review' }> | null>(null);
   const [Scanner, setScanner] = useState<ComponentType<BarcodeSheetProps> | null>(null);
   const [scanErr, setScanErr] = useState<string | null>(null);
   useEffect(() => {
@@ -95,12 +112,103 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
     }
   }
 
-  const title = step.kind === 'portion' ? 'Amount' : step.kind === 'custom' ? 'New custom food' : 'Add food';
-  const back = step.kind === 'list' ? undefined : { label: 'Back to search', onClick: () => setStep({ kind: 'list' }) };
+  async function suggest() {
+    if (!photo) return;
+    setSuggestErr(null);
+    setSuggesting(true);
+    ui.announce('Looking at your photo on this device');
+    const run = ++suggestRun.current;
+    try {
+      const rec = await getRecognizer();
+      const ranked = await rec.suggest(photo, { parts });
+      const [{ toCandidates }, { isUnsure }] = await Promise.all([import('../../vision/match'), import('../../vision/scoring')]);
+      if (run !== suggestRun.current) return; // cancelled meanwhile: ignore late results
+      const candidates = toCandidates(ranked, state.foodsById, state.index);
+      const review = { kind: 'review' as const, candidates, unsure: isUnsure(ranked) || candidates.length === 0 };
+      setLastReview(review);
+      setStep(review);
+      ui.announce(review.unsure ? "Can't tell what this is. Search is available." : `${candidates.length} possible matches`);
+    } catch (e) {
+      const code = (e as { code?: string }).code;
+      if (code !== 'cancelled' && run === suggestRun.current) {
+        setSuggestErr(
+          code === 'missing'
+            ? 'The suggestion model is no longer on this device. You can download it again, or search instead.'
+            : code === 'image'
+              ? 'This photo could not be read. Try another photo, or search instead.'
+              : 'Suggestions are not available right now. You can search instead; your photo is still attached.',
+        );
+        if (code === 'missing' || code === 'load') {
+          await resetRecognizer();
+          await refreshModelStatus();
+        }
+      }
+    } finally {
+      if (run === suggestRun.current) setSuggesting(false);
+    }
+  }
+
+  async function cancelSuggest() {
+    suggestRun.current++;
+    await resetRecognizer();
+    setSuggesting(false);
+  }
+
+  /** Advance the photo-suggestion queue after a save or skip. */
+  function nextInQueue(saved: boolean) {
+    if (step.kind !== 'portion' || !step.queue) return props.onClose();
+    if (saved) setPhotoUsed(true);
+    const pos = (step.pos ?? 0) + 1;
+    if (pos >= step.queue.length) return props.onClose();
+    setStep({ kind: 'portion', food: step.queue[pos], queue: step.queue, pos });
+  }
+
+  const title = step.kind === 'portion' ? 'Amount' : step.kind === 'custom' ? 'New custom food' : step.kind === 'review' ? 'Photo suggestions' : 'Add food';
+  const back =
+    step.kind === 'list'
+      ? undefined
+      : step.kind === 'portion' && step.queue && lastReview
+        ? { label: 'Back to possible matches', onClick: () => setStep(lastReview) }
+        : step.kind === 'review'
+          ? { label: 'Back to photo', onClick: () => { setStep({ kind: 'list' }); setTab('photo'); } }
+          : { label: 'Back to search', onClick: () => setStep({ kind: 'list' }) };
 
   const body = () => {
     if (step.kind === 'portion') {
-      return <PortionView food={step.food} initialMeal={meal} photo={photo} onSaved={props.onClose} />;
+      if (step.queue) {
+        const pos = step.pos ?? 0;
+        return (
+          <PortionView
+            key={step.food.id + pos}
+            food={step.food}
+            initialMeal={meal}
+            photo={photoUsed ? null : photo}
+            suggested={{ pos: pos + 1, total: step.queue.length, onSkip: () => nextInQueue(false) }}
+            onSaved={() => nextInQueue(true)}
+          />
+        );
+      }
+      return <PortionView food={step.food} initialMeal={meal} photo={photoUsed ? null : photo} onSaved={props.onClose} />;
+    }
+    if (step.kind === 'review') {
+      return (
+        <SuggestionReview
+          photoUrl={photoUrl}
+          candidates={step.candidates}
+          unsure={step.unsure}
+          onContinue={(foods) => setStep({ kind: 'portion', food: foods[0], queue: foods, pos: 0 })}
+          onSearch={(q) => {
+            setQuery(q);
+            setTab('search');
+            setStep({ kind: 'list' });
+          }}
+          onNotSure={() => {
+            setStep({ kind: 'list' });
+            setTab('photo');
+            ui.announce('Nothing was logged. Your photo is still attached; you can search or log it later.');
+          }}
+        />
+      );
     }
     if (step.kind === 'custom') {
       return <CustomFoodForm prefillName={step.name} prefillBarcode={step.barcode} onSaved={(food) => setStep({ kind: 'portion', food })} />;
@@ -224,32 +332,70 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
 
           {tab === 'photo' ? (
             <div class="pad stack">
-              <p class="notice strong"><Icon name="info" size={18} /> Photo recognition isn't available — photos are stored only on this device as a memory aid.</p>
-              {!state.settings.keepPhotos ? (
-                <>
-                  <p>Keeping photos is turned off. Turn it on to attach a photo to a meal you log by hand.</p>
-                  <button type="button" class="btn btn-secondary" onClick={() => void enablePhotos()}>Turn on photo keeping</button>
-                </>
-              ) : (
-                <>
-                  <p>Attach a photo, then choose the food it shows. You pick the food and the amount yourself.</p>
-                  {photoUrl ? (
-                    <figure class="photo-prev">
-                      <img src={photoUrl} alt="Your attached meal photo, shown only on this device" />
-                    </figure>
-                  ) : null}
-                  <label class="btn btn-secondary file-btn">
-                    <Icon name="camera" size={20} /> {photo ? 'Choose a different photo' : 'Take or choose a photo'}
-                    <input type="file" accept="image/*" class="sr-only-input" onChange={(e) => void onFile(e)} />
-                  </label>
-                  {photo ? (
-                    <div class="btn-row">
-                      <button type="button" class="btn btn-primary" onClick={() => setTab('search')}>Choose food</button>
-                      <button type="button" class="btn btn-secondary" onClick={() => setPhoto(null)}>Remove photo</button>
+              {photoUrl ? (
+                <figure class="photo-prev">
+                  <img src={photoUrl} alt="Your meal photo, shown only on this device" />
+                </figure>
+              ) : null}
+              <label class="btn btn-secondary file-btn">
+                <Icon name="camera" size={20} /> {photo ? 'Choose a different photo' : 'Take or choose a photo'}
+                <input type="file" accept="image/*" class="sr-only-input" onChange={(e) => void onFile(e)} />
+              </label>
+              <p class="hint">
+                {state.settings.keepPhotos
+                  ? 'The photo is saved with your entry on this device only.'
+                  : 'Keeping photos is off, so the photo is not saved with your entry.'}{' '}
+                {!state.settings.keepPhotos ? (
+                  <button type="button" class="link" onClick={() => void enablePhotos()}>Keep photos</button>
+                ) : null}
+              </p>
+
+              {state.settings.photoSuggestions && model.kind === 'ready' ? (
+                photo ? (
+                  suggesting ? (
+                    <div class="stack">
+                      <p class="notice" aria-busy="true"><Icon name="clock" size={18} /> Looking at your photo on this device…</p>
+                      <button type="button" class="btn btn-secondary" onClick={() => void cancelSuggest()}>Cancel</button>
                     </div>
-                  ) : null}
-                </>
+                  ) : (
+                    <div class="stack">
+                      <Switch
+                        label="Mixed plate or thali"
+                        hint="Also looks at parts of the photo. Slower."
+                        checked={parts}
+                        onChange={setParts}
+                      />
+                      <div class="btn-row">
+                        <button type="button" class="btn btn-primary" onClick={() => void suggest()}>
+                          <Icon name="search" size={18} /> Suggest food names
+                        </button>
+                        <button type="button" class="btn btn-secondary" onClick={() => setTab('search')}>Search instead</button>
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <p class="hint">Add a photo to get possible food names. You always choose the food and the amount.</p>
+                )
+              ) : state.settings.photoSuggestions || setupOpen ? (
+                <ModelPanel />
+              ) : (
+                <div class="notice">
+                  <Icon name="info" size={18} />
+                  <span>
+                    Optional: suggest food names from a photo, on this device.{' '}
+                    <button type="button" class="link" onClick={() => setSetupOpen(true)}>Set up</button>
+                  </span>
+                </div>
               )}
+              {suggestErr ? <p class="error" role="alert"><Icon name="alert" size={16} /> {suggestErr}</p> : null}
+              {photo && !suggesting ? (
+                <div class="btn-row">
+                  {model.kind !== 'ready' || !state.settings.photoSuggestions ? (
+                    <button type="button" class="btn btn-primary" onClick={() => setTab('search')}>Choose food</button>
+                  ) : null}
+                  <button type="button" class="btn btn-secondary" onClick={() => setPhoto(null)}>Remove photo</button>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>

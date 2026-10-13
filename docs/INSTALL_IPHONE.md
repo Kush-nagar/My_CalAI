@@ -32,6 +32,13 @@ Thali is a web app you install from Safari. No App Store, no account, no cost. (
 - Packaged-food **lookup on Open Food Facts** is off by default. If you turn it on in Settings, it only sends the barcode
   number, and only when you press the lookup button. The community-contributed data can be wrong; check it against the label.
 
+## Photo suggestions (optional, experimental)
+Off by default. In Settings › Photo suggestions you can download a ≈90 MB model once (Wi-Fi
+recommended). After that, Thali can suggest possible food names from a photo **on your phone, even in
+Airplane mode**. You always pick the food and the amount. The model has not yet been tested on a real
+iPhone, so please run the short checklist in `docs/PHOTO_SUGGESTIONS.md` and report what you see. If iOS
+clears website data the model may disappear; the app tells you and keeps working without it.
+
 ## Updating
 Open Thali while online. When a new version has downloaded, a bar at the bottom says **Update available — reload**.
 Tap Reload. Your data is not touched by updates. If you never see the bar, close the app fully and reopen it while online.

@@ -14,12 +14,14 @@ Your diary, recipes and photos stay in your browser's storage on your device.
   anything changes.
 - **Safe defaults:** under-18 mode hides calories by default and never shows goals, deficits, streaks or scores. Not
   medical advice.
-- **No photo recognition:** there was no lawful, validated model for Indian food. Photos can be attached as a memory aid
-  and stay on the device.
+- **Optional photo suggestions (experimental):** after a one-time ≈90 MB opt-in download, Thali can suggest possible food
+  names from a meal photo, entirely on the device (SigLIP 2, Apache-2.0). You pick the food and the amount; nothing is
+  saved without your confirmation, and it never guesses calories or portions. Not yet tested on an iPhone; see
+  [Photo suggestions](docs/PHOTO_SUGGESTIONS.md). Photos can always be attached as a memory aid.
 
 ## Docs
 - [Install on iPhone](docs/INSTALL_IPHONE.md) · [Deploy](docs/DEPLOY.md) · [Privacy](docs/PRIVACY.md)
-- [Data sources](docs/DATA_SOURCES.md) · [Licences](docs/LICENSES.md) · [Research handoff](docs/handoff/00_README.md)
+- [Photo suggestions](docs/PHOTO_SUGGESTIONS.md) · [Data sources](docs/DATA_SOURCES.md) · [Licences](docs/LICENSES.md) · [Research handoff](docs/handoff/00_README.md)
 
 ## Develop
 ```

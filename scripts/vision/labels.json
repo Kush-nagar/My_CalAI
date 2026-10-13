@@ -1,0 +1,1346 @@
+[
+ {
+  "label": "idli",
+  "prompt": "a photo of white round steamed rice cakes served with chutney and sambar",
+  "targets": [
+   "fdc:2708346"
+  ]
+ },
+ {
+  "label": "plain dosa",
+  "prompt": "a photo of a thin golden crispy rice crepe folded or rolled",
+  "targets": [
+   "fdc:2708347"
+  ]
+ },
+ {
+  "label": "masala dosa",
+  "prompt": "a photo of a large crispy dosa filled with potato masala, served with chutney",
+  "targets": [
+   "fdc:2709129",
+   "tpl:aloo-sabzi"
+  ]
+ },
+ {
+  "label": "uttapam",
+  "prompt": "a photo of a thick round savory pancake topped with onion and tomato",
+  "targets": [
+   "search:uttapam"
+  ]
+ },
+ {
+  "label": "medu vada",
+  "prompt": "a photo of fried ring-shaped doughnut-like lentil fritters",
+  "targets": [
+   "fdc:2709130"
+  ]
+ },
+ {
+  "label": "upma",
+  "prompt": "a photo of a soft semolina porridge-like savory dish with mustard seeds and vegetables",
+  "targets": [
+   "tpl:upma",
+   "fdc:2709128"
+  ]
+ },
+ {
+  "label": "pongal",
+  "prompt": "a photo of soft yellow rice and lentil porridge with pepper and cashews",
+  "targets": [
+   "search:pongal",
+   "tpl:khichdi"
+  ]
+ },
+ {
+  "label": "sambar",
+  "prompt": "a photo of a brown lentil and vegetable stew in a bowl",
+  "targets": [
+   "tpl:sambar",
+   "fdc:2707430"
+  ]
+ },
+ {
+  "label": "rasam",
+  "prompt": "a photo of a thin watery tamarind-tomato soup in a cup or bowl",
+  "targets": [
+   "search:rasam"
+  ]
+ },
+ {
+  "label": "coconut chutney",
+  "prompt": "a photo of white coconut chutney in a small bowl",
+  "targets": [
+   "search:coconut chutney",
+   "fdc:2709309"
+  ]
+ },
+ {
+  "label": "curd rice",
+  "prompt": "a photo of white rice mixed with yogurt, garnished with mustard seeds and curry leaves",
+  "targets": [
+   "tpl:curd-rice"
+  ]
+ },
+ {
+  "label": "lemon rice",
+  "prompt": "a photo of bright yellow rice with peanuts and curry leaves",
+  "targets": [
+   "search:lemon rice"
+  ]
+ },
+ {
+  "label": "tamarind rice puliyogare",
+  "prompt": "a photo of dark brown spiced tamarind rice with peanuts",
+  "targets": [
+   "search:puliyogare"
+  ]
+ },
+ {
+  "label": "bisi bele bath",
+  "prompt": "a photo of a thick red-brown rice and lentil dish with vegetables",
+  "targets": [
+   "search:bisi bele bath"
+  ]
+ },
+ {
+  "label": "appam",
+  "prompt": "a photo of a white lacy-edged bowl-shaped rice pancake",
+  "targets": [
+   "search:appam"
+  ]
+ },
+ {
+  "label": "puttu",
+  "prompt": "a photo of cylindrical steamed rice flour and coconut cakes",
+  "targets": [
+   "search:puttu"
+  ]
+ },
+ {
+  "label": "idiyappam string hoppers",
+  "prompt": "a photo of coiled white steamed rice noodle nests",
+  "targets": [
+   "search:idiyappam"
+  ]
+ },
+ {
+  "label": "kerala parotta",
+  "prompt": "a photo of layered flaky flatbread, rolled spiral",
+  "targets": [
+   "search:parotta",
+   "tpl:plain-paratha"
+  ]
+ },
+ {
+  "label": "fish curry",
+  "prompt": "a photo of pieces of fish in a red or orange gravy",
+  "targets": [
+   "fdc:2706460"
+  ]
+ },
+ {
+  "label": "fish fry",
+  "prompt": "a photo of whole or sliced fish, spiced and fried, reddish-brown crust",
+  "targets": [
+   "search:fish fry"
+  ]
+ },
+ {
+  "label": "prawn curry",
+  "prompt": "a photo of prawns in a red-orange gravy",
+  "targets": [
+   "search:prawn curry"
+  ]
+ },
+ {
+  "label": "avial mixed vegetable coconut curry",
+  "prompt": "a photo of mixed vegetable pieces in a white coconut-yogurt sauce",
+  "targets": [
+   "search:avial"
+  ]
+ },
+ {
+  "label": "poriyal thoran",
+  "prompt": "a photo of a dry stir-fry of finely chopped vegetables with coconut",
+  "targets": [
+   "search:poriyal"
+  ]
+ },
+ {
+  "label": "medu vada sambar",
+  "prompt": "a photo of a vada soaked in sambar in a bowl",
+  "targets": [
+   "fdc:2709130",
+   "tpl:sambar"
+  ]
+ },
+ {
+  "label": "filter coffee",
+  "prompt": "a photo of a small steel tumbler and dabarah with frothy coffee",
+  "targets": [
+   "search:filter coffee",
+   "fdc:171890"
+  ]
+ },
+ {
+  "label": "chicken chettinad or pepper fry",
+  "prompt": "a photo of dark spicy dry chicken pieces with curry leaves",
+  "targets": [
+   "search:chicken fry",
+   "fdc:2706437"
+  ]
+ },
+ {
+  "label": "roti chapati",
+  "prompt": "a photo of round thin flat whole-wheat bread, light brown spots",
+  "targets": [
+   "tpl:roti",
+   "fdc:171844",
+   "fdc:2707713"
+  ]
+ },
+ {
+  "label": "phulka",
+  "prompt": "a photo of small puffed thin roti",
+  "targets": [
+   "tpl:roti"
+  ]
+ },
+ {
+  "label": "plain paratha",
+  "prompt": "a photo of a layered pan-fried flatbread, golden brown",
+  "targets": [
+   "tpl:plain-paratha",
+   "fdc:2707715"
+  ]
+ },
+ {
+  "label": "aloo paratha",
+  "prompt": "a photo of a stuffed flatbread served with butter and curd",
+  "targets": [
+   "tpl:aloo-paratha"
+  ]
+ },
+ {
+  "label": "naan",
+  "prompt": "a photo of a soft teardrop-shaped oven-baked bread with charred blisters",
+  "targets": [
+   "fdc:171845",
+   "fdc:2707613"
+  ]
+ },
+ {
+  "label": "butter naan garlic naan",
+  "prompt": "a photo of naan brushed with butter or topped with garlic and herbs",
+  "targets": [
+   "fdc:171845",
+   "fdc:2707613"
+  ]
+ },
+ {
+  "label": "puri",
+  "prompt": "a photo of puffed round deep-fried bread",
+  "targets": [
+   "fdc:2707714"
+  ]
+ },
+ {
+  "label": "bhatura",
+  "prompt": "a photo of a large puffed fried bread served with chole",
+  "targets": [
+   "search:bhatura"
+  ]
+ },
+ {
+  "label": "chole bhature",
+  "prompt": "a photo of chickpea curry served with large fried bread",
+  "targets": [
+   "tpl:chole",
+   "search:bhatura"
+  ]
+ },
+ {
+  "label": "chole chana masala",
+  "prompt": "a photo of brown spiced chickpea curry in a bowl",
+  "targets": [
+   "tpl:chole",
+   "fdc:173757"
+  ]
+ },
+ {
+  "label": "rajma",
+  "prompt": "a photo of dark red kidney beans in a thick brown gravy",
+  "targets": [
+   "tpl:rajma"
+  ]
+ },
+ {
+  "label": "dal tadka yellow dal",
+  "prompt": "a photo of yellow lentil soup with tempering of cumin and red chilli",
+  "targets": [
+   "tpl:dal-tadka",
+   "fdc:2707427"
+  ]
+ },
+ {
+  "label": "dal makhani",
+  "prompt": "a photo of a creamy dark brown-black lentil dish with cream swirl",
+  "targets": [
+   "search:dal makhani"
+  ]
+ },
+ {
+  "label": "masoor dal",
+  "prompt": "a photo of orange-yellow red lentil dal",
+  "targets": [
+   "tpl:masoor-dal"
+  ]
+ },
+ {
+  "label": "moong dal",
+  "prompt": "a photo of yellow split moong dal or whole green moong dal",
+  "targets": [
+   "tpl:moong-dal"
+  ]
+ },
+ {
+  "label": "khichdi",
+  "prompt": "a photo of a soft porridge-like mix of rice and yellow lentils",
+  "targets": [
+   "tpl:khichdi"
+  ]
+ },
+ {
+  "label": "palak paneer",
+  "prompt": "a photo of green spinach puree gravy with white paneer cubes",
+  "targets": [
+   "fdc:2709631"
+  ]
+ },
+ {
+  "label": "paneer butter masala",
+  "prompt": "a photo of paneer cubes in a rich orange-red creamy tomato gravy",
+  "targets": [
+   "search:paneer butter masala",
+   "search:paneer"
+  ]
+ },
+ {
+  "label": "kadai paneer or paneer tikka masala",
+  "prompt": "a photo of paneer and capsicum cubes in a thick red-orange masala",
+  "targets": [
+   "search:kadai paneer",
+   "search:paneer"
+  ]
+ },
+ {
+  "label": "paneer tikka",
+  "prompt": "a photo of grilled marinated paneer cubes with charred edges on skewers",
+  "targets": [
+   "search:paneer tikka"
+  ]
+ },
+ {
+  "label": "plain paneer cubes",
+  "prompt": "a photo of white soft cubes of fresh cheese",
+  "targets": [
+   "fdc:2705740"
+  ]
+ },
+ {
+  "label": "tofu cubes",
+  "prompt": "a photo of white blocks or cubes of soy tofu",
+  "targets": [
+   "fdc:172475"
+  ]
+ },
+ {
+  "label": "aloo gobi",
+  "prompt": "a photo of dry yellow-spiced potato and cauliflower",
+  "targets": [
+   "tpl:aloo-gobi"
+  ]
+ },
+ {
+  "label": "aloo sabzi",
+  "prompt": "a photo of dry or semi-dry spiced potato curry",
+  "targets": [
+   "tpl:aloo-sabzi"
+  ]
+ },
+ {
+  "label": "jeera aloo",
+  "prompt": "a photo of cubed potatoes tossed with cumin",
+  "targets": [
+   "tpl:aloo-sabzi"
+  ]
+ },
+ {
+  "label": "bhindi masala",
+  "prompt": "a photo of green okra pieces stir-fried with onion",
+  "targets": [
+   "tpl:bhindi"
+  ]
+ },
+ {
+  "label": "baingan bharta",
+  "prompt": "a photo of smoky mashed roasted eggplant, dark orange-brown",
+  "targets": [
+   "tpl:baingan-bharta"
+  ]
+ },
+ {
+  "label": "mixed vegetable curry",
+  "prompt": "a photo of assorted vegetables in a gravy",
+  "targets": [
+   "fdc:2710067"
+  ]
+ },
+ {
+  "label": "matar paneer",
+  "prompt": "a photo of green peas and paneer in a red-orange gravy",
+  "targets": [
+   "search:matar paneer"
+  ]
+ },
+ {
+  "label": "mushroom masala",
+  "prompt": "a photo of button mushrooms in a brown or red gravy",
+  "targets": [
+   "search:mushroom masala",
+   "fdc:169251"
+  ]
+ },
+ {
+  "label": "lauki or tinda sabzi",
+  "prompt": "a photo of pale green gourd pieces in light gravy",
+  "targets": [
+   "search:lauki sabzi",
+   "fdc:169233"
+  ]
+ },
+ {
+  "label": "methi or palak sabzi",
+  "prompt": "a photo of dark green leafy vegetable stir-fry",
+  "targets": [
+   "search:palak sabzi",
+   "fdc:168463"
+  ]
+ },
+ {
+  "label": "sarson ka saag",
+  "prompt": "a photo of a thick dark green mustard greens puree with a dollop of butter",
+  "targets": [
+   "fdc:169257",
+   "fdc:2709632"
+  ]
+ },
+ {
+  "label": "kadhi",
+  "prompt": "a photo of pale yellow yogurt-gram flour gravy with pakoras",
+  "targets": [
+   "tpl:kadhi"
+  ]
+ },
+ {
+  "label": "raita",
+  "prompt": "a photo of a bowl of whipped yogurt with cucumber or boondi",
+  "targets": [
+   "tpl:cucumber-raita"
+  ]
+ },
+ {
+  "label": "plain curd dahi",
+  "prompt": "a photo of white plain yogurt in a bowl",
+  "targets": [
+   "fdc:171284"
+  ]
+ },
+ {
+  "label": "lassi",
+  "prompt": "a photo of a tall glass of thick white yogurt drink, maybe with cream",
+  "targets": [
+   "tpl:sweet-lassi"
+  ]
+ },
+ {
+  "label": "buttermilk chaas",
+  "prompt": "a photo of a glass of thin white spiced buttermilk",
+  "targets": [
+   "search:chaas",
+   "fdc:2259792"
+  ]
+ },
+ {
+  "label": "masala chai",
+  "prompt": "a photo of a cup of milky brown tea",
+  "targets": [
+   "tpl:masala-chai",
+   "fdc:2710506"
+  ]
+ },
+ {
+  "label": "black tea or coffee",
+  "prompt": "a photo of a cup of dark tea or black coffee without milk",
+  "targets": [
+   "fdc:173227",
+   "fdc:171890"
+  ]
+ },
+ {
+  "label": "milk glass",
+  "prompt": "a photo of a glass of plain white milk",
+  "targets": [
+   "fdc:171265"
+  ]
+ },
+ {
+  "label": "fruit juice",
+  "prompt": "a photo of a glass of orange or mixed fruit juice",
+  "targets": [
+   "fdc:169098"
+  ]
+ },
+ {
+  "label": "coconut water",
+  "prompt": "a photo of tender green coconut with straw",
+  "targets": [
+   "fdc:170174"
+  ]
+ },
+ {
+  "label": "sugarcane juice",
+  "prompt": "a photo of greenish-yellow frothy juice in a tall glass",
+  "targets": [
+   "search:sugarcane juice"
+  ]
+ },
+ {
+  "label": "chicken curry",
+  "prompt": "a photo of pieces of chicken in a brown or orange gravy",
+  "targets": [
+   "tpl:chicken-curry",
+   "fdc:2706437"
+  ]
+ },
+ {
+  "label": "butter chicken",
+  "prompt": "a photo of chicken pieces in a creamy orange-red tomato gravy",
+  "targets": [
+   "search:butter chicken",
+   "tpl:chicken-curry"
+  ]
+ },
+ {
+  "label": "tandoori chicken",
+  "prompt": "a photo of bright red-orange charred chicken legs",
+  "targets": [
+   "search:tandoori chicken",
+   "fdc:2706437"
+  ]
+ },
+ {
+  "label": "chicken tikka",
+  "prompt": "a photo of charred boneless marinated chicken pieces on skewers",
+  "targets": [
+   "search:chicken tikka"
+  ]
+ },
+ {
+  "label": "mutton curry",
+  "prompt": "a photo of chunks of goat meat on bone in dark gravy",
+  "targets": [
+   "tpl:mutton-curry"
+  ]
+ },
+ {
+  "label": "keema",
+  "prompt": "a photo of spiced minced meat cooked dry or with peas",
+  "targets": [
+   "fdc:172544",
+   "search:keema"
+  ]
+ },
+ {
+  "label": "egg curry",
+  "prompt": "a photo of boiled eggs halved in a red-brown gravy",
+  "targets": [
+   "search:egg curry"
+  ]
+ },
+ {
+  "label": "egg bhurji",
+  "prompt": "a photo of spiced scrambled eggs with onion and tomato",
+  "targets": [
+   "tpl:egg-bhurji"
+  ]
+ },
+ {
+  "label": "omelette",
+  "prompt": "a photo of a folded or round fried egg omelette",
+  "targets": [
+   "fdc:172185",
+   "fdc:2707200"
+  ]
+ },
+ {
+  "label": "boiled eggs",
+  "prompt": "a photo of peeled or halved hard-boiled eggs",
+  "targets": [
+   "fdc:173424"
+  ]
+ },
+ {
+  "label": "fried egg",
+  "prompt": "a photo of a sunny-side-up or fried egg",
+  "targets": [
+   "fdc:173423",
+   "fdc:2707158"
+  ]
+ },
+ {
+  "label": "chicken biryani",
+  "prompt": "a photo of layered spiced rice with chicken pieces, yellow-orange rice",
+  "targets": [
+   "fdc:2706538"
+  ]
+ },
+ {
+  "label": "mutton biryani",
+  "prompt": "a photo of spiced rice with mutton pieces, garnished with fried onion",
+  "targets": [
+   "fdc:2706490"
+  ]
+ },
+ {
+  "label": "veg biryani",
+  "prompt": "a photo of spiced rice with mixed vegetables",
+  "targets": [
+   "fdc:2708985"
+  ]
+ },
+ {
+  "label": "veg pulao",
+  "prompt": "a photo of mildly spiced rice with peas, carrots and whole spices",
+  "targets": [
+   "tpl:veg-pulao"
+  ]
+ },
+ {
+  "label": "jeera rice",
+  "prompt": "a photo of fluffy white rice with cumin seeds",
+  "targets": [
+   "tpl:jeera-rice"
+  ]
+ },
+ {
+  "label": "plain white rice",
+  "prompt": "a photo of a plate of plain steamed white rice",
+  "targets": [
+   "fdc:169757"
+  ]
+ },
+ {
+  "label": "brown rice",
+  "prompt": "a photo of cooked brown whole-grain rice",
+  "targets": [
+   "fdc:169704"
+  ]
+ },
+ {
+  "label": "fried rice",
+  "prompt": "a photo of fried rice with vegetables and egg, indo-chinese style",
+  "targets": [
+   "search:fried rice"
+  ]
+ },
+ {
+  "label": "dal chawal",
+  "prompt": "a photo of yellow dal poured over white rice",
+  "targets": [
+   "fdc:2707432"
+  ]
+ },
+ {
+  "label": "rajma chawal",
+  "prompt": "a photo of kidney bean curry served on rice",
+  "targets": [
+   "tpl:rajma",
+   "fdc:169757"
+  ]
+ },
+ {
+  "label": "pulao with raita",
+  "prompt": "a photo of pulao rice with a bowl of raita",
+  "targets": [
+   "tpl:veg-pulao",
+   "tpl:cucumber-raita"
+  ]
+ },
+ {
+  "label": "samosa",
+  "prompt": "a photo of a deep-fried triangular pastry",
+  "targets": [
+   "fdc:2708730"
+  ]
+ },
+ {
+  "label": "kachori",
+  "prompt": "a photo of a round flaky fried pastry, golden",
+  "targets": [
+   "search:kachori"
+  ]
+ },
+ {
+  "label": "pakora bhajia",
+  "prompt": "a photo of assorted deep-fried batter fritters",
+  "targets": [
+   "fdc:2710066"
+  ]
+ },
+ {
+  "label": "onion bhaji",
+  "prompt": "a photo of tangle of crispy fried onion fritters",
+  "targets": [
+   "fdc:2710066"
+  ]
+ },
+ {
+  "label": "bread pakora",
+  "prompt": "a photo of bread slices stuffed and fried in gram flour batter",
+  "targets": [
+   "search:bread pakora"
+  ]
+ },
+ {
+  "label": "vada pav",
+  "prompt": "a photo of a fried potato patty in a soft bun with chutney",
+  "targets": [
+   "search:vada pav"
+  ]
+ },
+ {
+  "label": "pav bhaji",
+  "prompt": "a photo of a mashed red vegetable curry with soft buttered bread rolls",
+  "targets": [
+   "search:pav bhaji"
+  ]
+ },
+ {
+  "label": "misal pav",
+  "prompt": "a photo of spicy sprout curry with red oil, topped with farsan, with bread",
+  "targets": [
+   "search:misal pav"
+  ]
+ },
+ {
+  "label": "poha",
+  "prompt": "a photo of flattened rice with yellow turmeric, peanuts and curry leaves",
+  "targets": [
+   "search:poha"
+  ]
+ },
+ {
+  "label": "sabudana khichdi",
+  "prompt": "a photo of translucent tapioca pearls with peanuts",
+  "targets": [
+   "tpl:sabudana-khichdi"
+  ]
+ },
+ {
+  "label": "sabudana vada",
+  "prompt": "a photo of fried round tapioca patties",
+  "targets": [
+   "search:sabudana vada"
+  ]
+ },
+ {
+  "label": "besan chilla",
+  "prompt": "a photo of a savory gram flour pancake, yellow-green",
+  "targets": [
+   "tpl:besan-chilla"
+  ]
+ },
+ {
+  "label": "moong dal chilla",
+  "prompt": "a photo of a thin yellow-green lentil pancake",
+  "targets": [
+   "search:moong chilla",
+   "tpl:besan-chilla"
+  ]
+ },
+ {
+  "label": "thepla",
+  "prompt": "a photo of a thin spiced flatbread with fenugreek, green flecks",
+  "targets": [
+   "search:thepla"
+  ]
+ },
+ {
+  "label": "dhokla",
+  "prompt": "a photo of soft yellow spongy steamed squares",
+  "targets": [
+   "search:dhokla"
+  ]
+ },
+ {
+  "label": "khandvi",
+  "prompt": "a photo of thin yellow rolled gram flour sheets",
+  "targets": [
+   "search:khandvi"
+  ]
+ },
+ {
+  "label": "fafda jalebi",
+  "prompt": "a photo of long crispy yellow fried strips with orange jalebi",
+  "targets": [
+   "search:fafda"
+  ]
+ },
+ {
+  "label": "gujarati thali",
+  "prompt": "a photo of a round steel plate with many small bowls of vegetables, dal, rice and roti",
+  "targets": [
+   "tpl:roti",
+   "tpl:dal-tadka",
+   "tpl:veg-pulao"
+  ]
+ },
+ {
+  "label": "north indian thali",
+  "prompt": "a photo of a platter with roti, dal, rice, vegetable curry, raita and salad",
+  "targets": [
+   "tpl:roti",
+   "tpl:dal-tadka",
+   "fdc:169757"
+  ]
+ },
+ {
+  "label": "south indian meals banana leaf",
+  "prompt": "a photo of rice with sambar, rasam, poriyal and papad on a banana leaf",
+  "targets": [
+   "fdc:169757",
+   "tpl:sambar"
+  ]
+ },
+ {
+  "label": "papad",
+  "prompt": "a photo of a thin crisp round disc, roasted or fried",
+  "targets": [
+   "fdc:168106"
+  ]
+ },
+ {
+  "label": "pickle achar",
+  "prompt": "a photo of a small portion of oily spicy pickle",
+  "targets": [
+   "search:pickle"
+  ]
+ },
+ {
+  "label": "green chutney",
+  "prompt": "a photo of a bowl of green coriander mint chutney",
+  "targets": [
+   "fdc:2709309",
+   "search:green chutney"
+  ]
+ },
+ {
+  "label": "tamarind chutney",
+  "prompt": "a photo of a dark brown sweet-sour chutney",
+  "targets": [
+   "fdc:2709309"
+  ]
+ },
+ {
+  "label": "undhiyu or mixed veg sabzi",
+  "prompt": "a photo of green and orange mixed vegetables with fenugreek dumplings",
+  "targets": [
+   "search:undhiyu"
+  ]
+ },
+ {
+  "label": "litti chokha",
+  "prompt": "a photo of baked round wheat balls with mashed spiced vegetables",
+  "targets": [
+   "search:litti chokha"
+  ]
+ },
+ {
+  "label": "sattu paratha",
+  "prompt": "a photo of stuffed flatbread filled with roasted gram flour",
+  "targets": [
+   "search:sattu paratha"
+  ]
+ },
+ {
+  "label": "machher jhol",
+  "prompt": "a photo of Bengali thin fish curry with potato in light gravy",
+  "targets": [
+   "fdc:2706460"
+  ]
+ },
+ {
+  "label": "luchi",
+  "prompt": "a photo of small round puffed white flour bread",
+  "targets": [
+   "fdc:2707714"
+  ]
+ },
+ {
+  "label": "aloo posto",
+  "prompt": "a photo of potato in a pale poppy seed paste",
+  "targets": [
+   "search:aloo posto"
+  ]
+ },
+ {
+  "label": "shukto or bengali mixed veg",
+  "prompt": "a photo of mixed bitter vegetables in light milk sauce",
+  "targets": [
+   "search:shukto"
+  ]
+ },
+ {
+  "label": "mishti doi",
+  "prompt": "a photo of sweet brown set yogurt in clay pot",
+  "targets": [
+   "search:mishti doi"
+  ]
+ },
+ {
+  "label": "rosogolla",
+  "prompt": "a photo of white round spongy syrup-soaked cheese balls",
+  "targets": [
+   "search:rasgulla"
+  ]
+ },
+ {
+  "label": "sandesh",
+  "prompt": "a photo of soft pressed milk sweet, pale, often molded",
+  "targets": [
+   "search:sandesh"
+  ]
+ },
+ {
+  "label": "momos",
+  "prompt": "a photo of small pleated steamed dumplings in a steamer basket",
+  "targets": [
+   "search:momos"
+  ]
+ },
+ {
+  "label": "thukpa",
+  "prompt": "a photo of a noodle soup with vegetables or meat in broth",
+  "targets": [
+   "search:thukpa"
+  ]
+ },
+ {
+  "label": "jadoh or pork with rice",
+  "prompt": "a photo of rice cooked with pork, Meghalaya",
+  "targets": [
+   "search:jadoh"
+  ]
+ },
+ {
+  "label": "smoked pork with bamboo shoot",
+  "prompt": "a photo of dark stew of pork and fermented bamboo shoot",
+  "targets": [
+   "search:pork bamboo shoot",
+   "fdc:169210"
+  ]
+ },
+ {
+  "label": "khar assamese",
+  "prompt": "a photo of pale vegetable dish with raw papaya and pulses",
+  "targets": [
+   "search:khar"
+  ]
+ },
+ {
+  "label": "dal rice with fish assam tenga",
+  "prompt": "a photo of light sour fish curry with rice",
+  "targets": [
+   "search:masor tenga",
+   "fdc:2706461"
+  ]
+ },
+ {
+  "label": "gulab jamun",
+  "prompt": "a photo of dark brown fried milk balls in syrup",
+  "targets": [
+   "search:gulab jamun"
+  ]
+ },
+ {
+  "label": "jalebi",
+  "prompt": "a photo of bright orange crisp spiral sweet",
+  "targets": [
+   "search:jalebi"
+  ]
+ },
+ {
+  "label": "rasmalai",
+  "prompt": "a photo of white flat discs in thick pale milk sauce",
+  "targets": [
+   "search:rasmalai"
+  ]
+ },
+ {
+  "label": "kheer",
+  "prompt": "a photo of a creamy white rice pudding with nuts",
+  "targets": [
+   "fdc:2705686",
+   "search:kheer"
+  ]
+ },
+ {
+  "label": "halwa",
+  "prompt": "a photo of a soft dense sweet, orange or brown, made of semolina or carrot",
+  "targets": [
+   "search:halwa"
+  ]
+ },
+ {
+  "label": "gajar halwa",
+  "prompt": "a photo of grated carrot pudding, orange, with nuts",
+  "targets": [
+   "search:gajar halwa",
+   "fdc:170393"
+  ]
+ },
+ {
+  "label": "ladoo",
+  "prompt": "a photo of round golden or orange ball-shaped sweets",
+  "targets": [
+   "fdc:2710351"
+  ]
+ },
+ {
+  "label": "barfi",
+  "prompt": "a photo of flat square or diamond fudge-like sweet",
+  "targets": [
+   "fdc:2705700"
+  ]
+ },
+ {
+  "label": "peda",
+  "prompt": "a photo of small round soft milk sweets",
+  "targets": [
+   "search:peda"
+  ]
+ },
+ {
+  "label": "payasam",
+  "prompt": "a photo of sweet milky pudding with vermicelli or rice in a bowl",
+  "targets": [
+   "search:payasam",
+   "fdc:2705686"
+  ]
+ },
+ {
+  "label": "ice cream",
+  "prompt": "a photo of scoops of ice cream in a cup or cone",
+  "targets": [
+   "fdc:167575"
+  ]
+ },
+ {
+  "label": "kulfi",
+  "prompt": "a photo of dense frozen milk dessert on a stick",
+  "targets": [
+   "search:kulfi"
+  ]
+ },
+ {
+  "label": "chocolate",
+  "prompt": "a photo of pieces of chocolate",
+  "targets": [
+   "fdc:167587",
+   "fdc:170273"
+  ]
+ },
+ {
+  "label": "biscuits",
+  "prompt": "a photo of plain round biscuits or cookies",
+  "targets": [
+   "fdc:171867"
+  ]
+ },
+ {
+  "label": "banana",
+  "prompt": "a photo of one or more yellow bananas",
+  "targets": [
+   "fdc:173944"
+  ]
+ },
+ {
+  "label": "mango",
+  "prompt": "a photo of ripe yellow or orange mango, whole or sliced",
+  "targets": [
+   "fdc:169910"
+  ]
+ },
+ {
+  "label": "apple",
+  "prompt": "a photo of a red or green apple",
+  "targets": [
+   "fdc:171688"
+  ]
+ },
+ {
+  "label": "orange or mosambi",
+  "prompt": "a photo of a round orange citrus fruit, whole or in segments",
+  "targets": [
+   "fdc:169097",
+   "fdc:169105"
+  ]
+ },
+ {
+  "label": "grapes",
+  "prompt": "a photo of a bunch of green or black grapes",
+  "targets": [
+   "fdc:174683"
+  ]
+ },
+ {
+  "label": "papaya",
+  "prompt": "a photo of orange-fleshed sliced papaya",
+  "targets": [
+   "fdc:169926"
+  ]
+ },
+ {
+  "label": "guava",
+  "prompt": "a photo of a green round guava, sliced",
+  "targets": [
+   "fdc:173044"
+  ]
+ },
+ {
+  "label": "watermelon",
+  "prompt": "a photo of red slices of watermelon",
+  "targets": [
+   "fdc:167765"
+  ]
+ },
+ {
+  "label": "pomegranate",
+  "prompt": "a photo of red pomegranate seeds",
+  "targets": [
+   "fdc:169134"
+  ]
+ },
+ {
+  "label": "mixed fruit bowl",
+  "prompt": "a photo of a bowl of assorted cut fruits",
+  "targets": [
+   "search:fruit salad"
+  ]
+ },
+ {
+  "label": "sprouts salad",
+  "prompt": "a photo of bowl of sprouted moong with onion and tomato",
+  "targets": [
+   "fdc:169137",
+   "fdc:169957"
+  ]
+ },
+ {
+  "label": "cucumber tomato onion salad",
+  "prompt": "a photo of sliced cucumber, tomato and onion with lemon",
+  "targets": [
+   "fdc:168409",
+   "fdc:170457"
+  ]
+ },
+ {
+  "label": "roasted peanuts",
+  "prompt": "a photo of a handful of roasted peanuts",
+  "targets": [
+   "fdc:173806"
+  ]
+ },
+ {
+  "label": "almonds and cashews",
+  "prompt": "a photo of a handful of mixed dry fruits and nuts",
+  "targets": [
+   "fdc:170567",
+   "fdc:170162"
+  ]
+ },
+ {
+  "label": "dates",
+  "prompt": "a photo of dark brown dates",
+  "targets": [
+   "fdc:171726"
+  ]
+ },
+ {
+  "label": "popcorn",
+  "prompt": "a photo of puffed white popcorn in a bowl",
+  "targets": [
+   "fdc:167959"
+  ]
+ },
+ {
+  "label": "potato chips",
+  "prompt": "a photo of crisp thin potato chips from a packet",
+  "targets": [
+   "fdc:169677"
+  ]
+ },
+ {
+  "label": "boiled corn",
+  "prompt": "a photo of a corn cob, boiled or roasted",
+  "targets": [
+   "fdc:169999"
+  ]
+ },
+ {
+  "label": "boiled potato",
+  "prompt": "a photo of boiled whole or halved potatoes",
+  "targets": [
+   "fdc:170438"
+  ]
+ },
+ {
+  "label": "bread toast",
+  "prompt": "a photo of slices of toast, white or brown bread",
+  "targets": [
+   "fdc:174924",
+   "fdc:172688"
+  ]
+ },
+ {
+  "label": "bread butter jam sandwich",
+  "prompt": "a photo of sandwich of sliced bread with filling",
+  "targets": [
+   "search:sandwich",
+   "fdc:174924"
+  ]
+ },
+ {
+  "label": "veg sandwich grilled",
+  "prompt": "a photo of a grilled toasted vegetable sandwich cut in triangles",
+  "targets": [
+   "search:veg sandwich"
+  ]
+ },
+ {
+  "label": "pizza",
+  "prompt": "a photo of a round pizza with cheese and toppings",
+  "targets": [
+   "search:pizza"
+  ]
+ },
+ {
+  "label": "burger",
+  "prompt": "a photo of a burger in a bun with patty and lettuce",
+  "targets": [
+   "search:burger"
+  ]
+ },
+ {
+  "label": "french fries",
+  "prompt": "a photo of golden fries in a pile",
+  "targets": [
+   "search:french fries"
+  ]
+ },
+ {
+  "label": "pasta",
+  "prompt": "a photo of pasta in red or white sauce on a plate",
+  "targets": [
+   "fdc:169737"
+  ]
+ },
+ {
+  "label": "noodles hakka",
+  "prompt": "a photo of stir-fried noodles with vegetables, indo-chinese",
+  "targets": [
+   "search:hakka noodles",
+   "fdc:169737"
+  ]
+ },
+ {
+  "label": "manchurian",
+  "prompt": "a photo of dark brown fried balls in sticky sauce",
+  "targets": [
+   "search:manchurian"
+  ]
+ },
+ {
+  "label": "oats porridge",
+  "prompt": "a photo of a bowl of cooked oatmeal",
+  "targets": [
+   "fdc:173905"
+  ]
+ },
+ {
+  "label": "cornflakes or muesli with milk",
+  "prompt": "a photo of a bowl of cereal in milk",
+  "targets": [
+   "search:cornflakes"
+  ]
+ },
+ {
+  "label": "quinoa bowl",
+  "prompt": "a photo of cooked quinoa seeds in a bowl",
+  "targets": [
+   "fdc:168917"
+  ]
+ },
+ {
+  "label": "grilled chicken breast",
+  "prompt": "a photo of plain grilled or roasted chicken breast",
+  "targets": [
+   "fdc:171477"
+  ]
+ },
+ {
+  "label": "roast chicken",
+  "prompt": "a photo of a whole or pieces of roasted chicken",
+  "targets": [
+   "fdc:171054"
+  ]
+ },
+ {
+  "label": "grilled fish",
+  "prompt": "a photo of a whole grilled or pan-fried fish",
+  "targets": [
+   "search:grilled fish",
+   "fdc:175177"
+  ]
+ },
+ {
+  "label": "prawns fry",
+  "prompt": "a photo of fried or sauteed prawns",
+  "targets": [
+   "fdc:171971",
+   "search:prawn fry"
+  ]
+ },
+ {
+  "label": "salad greens",
+  "prompt": "a photo of a bowl of green leaves and vegetables",
+  "targets": [
+   "search:salad"
+  ]
+ },
+ {
+  "label": "soup",
+  "prompt": "a photo of a bowl of vegetable or tomato soup",
+  "targets": [
+   "search:soup"
+  ]
+ },
+ {
+  "label": "curry in bowl brown gravy",
+  "prompt": "a photo of generic brown gravy curry in a bowl",
+  "targets": [
+   "search:curry"
+  ]
+ }
+]

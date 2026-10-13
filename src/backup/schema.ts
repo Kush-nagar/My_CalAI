@@ -283,6 +283,7 @@ export function checkSettings(e: Errs, p: string, v: unknown): v is Partial<Sett
   }
   bool(e, `${p}.onlineLookup`, v.onlineLookup, true);
   bool(e, `${p}.keepPhotos`, v.keepPhotos, true);
+  bool(e, `${p}.photoSuggestions`, v.photoSuggestions, true);
   oneOf(e, `${p}.theme`, v.theme, ['system', 'light', 'dark'], true);
   iso(e, `${p}.lastBackupAt`, v.lastBackupAt, true);
   bool(e, `${p}.onboarded`, v.onboarded, true);
