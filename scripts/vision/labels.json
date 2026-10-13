@@ -1342,5 +1342,692 @@
   "targets": [
    "search:curry"
   ]
+ },
+ {
+  "label": "cheeseburger",
+  "prompt": "a photo of a cheeseburger with a beef patty, cheese and a bun",
+  "targets": [
+   "fdc:2706888"
+  ]
+ },
+ {
+  "label": "hot dog",
+  "prompt": "a photo of a hot dog sausage in a bun",
+  "targets": [
+   "fdc:2706166"
+  ]
+ },
+ {
+  "label": "fried chicken",
+  "prompt": "a photo of crispy fried chicken pieces",
+  "targets": [
+   "fdc:2706065",
+   "search:fried chicken"
+  ]
+ },
+ {
+  "label": "chicken wings",
+  "prompt": "a photo of chicken wings with sauce",
+  "targets": [
+   "fdc:2706063",
+   "fdc:2706065"
+  ]
+ },
+ {
+  "label": "beef steak",
+  "prompt": "a photo of a grilled beef steak",
+  "targets": [
+   "fdc:2705824"
+  ]
+ },
+ {
+  "label": "spaghetti with tomato sauce",
+  "prompt": "a photo of spaghetti with red tomato or meat sauce",
+  "targets": [
+   "fdc:2708828",
+   "search:spaghetti"
+  ]
+ },
+ {
+  "label": "macaroni and cheese",
+  "prompt": "a photo of macaroni and cheese",
+  "targets": [
+   "fdc:169770"
+  ]
+ },
+ {
+  "label": "lasagna",
+  "prompt": "a photo of a slice of lasagna with layers of pasta, cheese and sauce",
+  "targets": [
+   "fdc:2708750"
+  ]
+ },
+ {
+  "label": "ramen",
+  "prompt": "a photo of a bowl of ramen noodle soup",
+  "targets": [
+   "fdc:2709153"
+  ]
+ },
+ {
+  "label": "pho",
+  "prompt": "a photo of a bowl of vietnamese pho noodle soup",
+  "targets": [
+   "fdc:2707125"
+  ]
+ },
+ {
+  "label": "pad thai",
+  "prompt": "a photo of pad thai stir fried rice noodles",
+  "targets": [
+   "fdc:2708804"
+  ]
+ },
+ {
+  "label": "sushi rolls",
+  "prompt": "a photo of sushi rolls with rice, seaweed and fish",
+  "targets": [
+   "fdc:2708965"
+  ]
+ },
+ {
+  "label": "dumplings",
+  "prompt": "a photo of steamed or fried dumplings",
+  "targets": [
+   "fdc:2708344"
+  ]
+ },
+ {
+  "label": "spring rolls",
+  "prompt": "a photo of fried spring rolls",
+  "targets": [
+   "fdc:2708700",
+   "fdc:2708701"
+  ]
+ },
+ {
+  "label": "tacos",
+  "prompt": "a photo of tacos with meat and toppings in tortillas",
+  "targets": [
+   "fdc:2708514"
+  ]
+ },
+ {
+  "label": "burrito",
+  "prompt": "a photo of a burrito wrapped in a flour tortilla",
+  "targets": [
+   "fdc:2708534"
+  ]
+ },
+ {
+  "label": "nachos",
+  "prompt": "a photo of nachos with cheese",
+  "targets": [
+   "fdc:2708576"
+  ]
+ },
+ {
+  "label": "quesadilla",
+  "prompt": "a photo of a quesadilla with melted cheese",
+  "targets": [
+   "fdc:2708590",
+   "fdc:2708591"
+  ]
+ },
+ {
+  "label": "guacamole",
+  "prompt": "a photo of guacamole avocado dip",
+  "targets": [
+   "fdc:2709307"
+  ]
+ },
+ {
+  "label": "caesar salad",
+  "prompt": "a photo of caesar salad with romaine, croutons and parmesan",
+  "targets": [
+   "fdc:2709591"
+  ]
+ },
+ {
+  "label": "greek salad",
+  "prompt": "a photo of greek salad with tomato, cucumber, olives and feta",
+  "targets": [
+   "fdc:2709830"
+  ]
+ },
+ {
+  "label": "hummus",
+  "prompt": "a photo of hummus chickpea dip",
+  "targets": [
+   "fdc:2707402"
+  ]
+ },
+ {
+  "label": "falafel",
+  "prompt": "a photo of falafel balls",
+  "targets": [
+   "fdc:2707408"
+  ]
+ },
+ {
+  "label": "shawarma or gyro wrap",
+  "prompt": "a photo of a shawarma or gyro meat wrap",
+  "targets": [
+   "fdc:2706962"
+  ]
+ },
+ {
+  "label": "kebab skewers",
+  "prompt": "a photo of grilled meat kebab skewers",
+  "targets": [
+   "fdc:2706730"
+  ]
+ },
+ {
+  "label": "pancakes",
+  "prompt": "a photo of a stack of pancakes",
+  "targets": [
+   "fdc:2708304"
+  ]
+ },
+ {
+  "label": "waffles",
+  "prompt": "a photo of waffles",
+  "targets": [
+   "fdc:2708325"
+  ]
+ },
+ {
+  "label": "french toast",
+  "prompt": "a photo of french toast",
+  "targets": [
+   "fdc:2708331"
+  ]
+ },
+ {
+  "label": "scrambled eggs",
+  "prompt": "a photo of scrambled eggs",
+  "targets": [
+   "fdc:173272"
+  ]
+ },
+ {
+  "label": "bacon",
+  "prompt": "a photo of strips of cooked bacon",
+  "targets": [
+   "search:bacon"
+  ]
+ },
+ {
+  "label": "sausages",
+  "prompt": "a photo of cooked sausages",
+  "targets": [
+   "fdc:2706190",
+   "fdc:2706191"
+  ]
+ },
+ {
+  "label": "bagel",
+  "prompt": "a photo of a bagel",
+  "targets": [
+   "fdc:2707684"
+  ]
+ },
+ {
+  "label": "croissant",
+  "prompt": "a photo of a croissant",
+  "targets": [
+   "fdc:2707678"
+  ]
+ },
+ {
+  "label": "muffin",
+  "prompt": "a photo of a muffin",
+  "targets": [
+   "fdc:2707829"
+  ]
+ },
+ {
+  "label": "donut",
+  "prompt": "a photo of a doughnut",
+  "targets": [
+   "fdc:2708062"
+  ]
+ },
+ {
+  "label": "cake slice",
+  "prompt": "a photo of a slice of cake with frosting",
+  "targets": [
+   "search:cake"
+  ]
+ },
+ {
+  "label": "cheesecake",
+  "prompt": "a photo of a slice of cheesecake",
+  "targets": [
+   "fdc:2707862"
+  ]
+ },
+ {
+  "label": "brownie",
+  "prompt": "a photo of a chocolate brownie",
+  "targets": [
+   "fdc:2707903"
+  ]
+ },
+ {
+  "label": "cookies",
+  "prompt": "a photo of cookies",
+  "targets": [
+   "fdc:2707899"
+  ]
+ },
+ {
+  "label": "apple pie",
+  "prompt": "a photo of a slice of apple pie",
+  "targets": [
+   "fdc:2707995"
+  ]
+ },
+ {
+  "label": "yogurt bowl with fruit and granola",
+  "prompt": "a photo of a bowl of yogurt with fruit and granola",
+  "targets": [
+   "fdc:2705450"
+  ]
+ },
+ {
+  "label": "oatmeal",
+  "prompt": "a photo of a bowl of oatmeal porridge",
+  "targets": [
+   "fdc:2708380"
+  ]
+ },
+ {
+  "label": "cereal with milk",
+  "prompt": "a photo of a bowl of breakfast cereal with milk",
+  "targets": [
+   "fdc:2708445",
+   "search:milk"
+  ]
+ },
+ {
+  "label": "smoothie",
+  "prompt": "a photo of a smoothie in a glass",
+  "targets": [
+   "fdc:2705513",
+   "fdc:2705514",
+   "search:smoothie"
+  ]
+ },
+ {
+  "label": "protein shake",
+  "prompt": "a photo of a protein shake",
+  "targets": [
+   "fdc:174181"
+  ]
+ },
+ {
+  "label": "avocado toast",
+  "prompt": "a photo of avocado toast",
+  "targets": [
+   "fdc:2709223",
+   "fdc:2707599"
+  ]
+ },
+ {
+  "label": "sandwich",
+  "prompt": "a photo of a sandwich with filling between bread slices",
+  "targets": [
+   "fdc:2706880"
+  ]
+ },
+ {
+  "label": "grilled cheese sandwich",
+  "prompt": "a photo of a grilled cheese sandwich",
+  "targets": [
+   "fdc:2705801"
+  ]
+ },
+ {
+  "label": "tomato soup",
+  "prompt": "a photo of a bowl of tomato soup",
+  "targets": [
+   "fdc:2709757"
+  ]
+ },
+ {
+  "label": "chicken noodle soup",
+  "prompt": "a photo of a bowl of chicken noodle soup",
+  "targets": [
+   "fdc:2709149"
+  ]
+ },
+ {
+  "label": "miso soup",
+  "prompt": "a photo of miso soup",
+  "targets": [
+   "fdc:2707455"
+  ]
+ },
+ {
+  "label": "thai curry",
+  "prompt": "a photo of thai green or red curry",
+  "targets": [
+   "search:thai curry",
+   "search:curry"
+  ]
+ },
+ {
+  "label": "vegetable stir fry",
+  "prompt": "a photo of stir fried vegetables",
+  "targets": [
+   "fdc:2710036"
+  ]
+ },
+ {
+  "label": "salmon fillet",
+  "prompt": "a photo of a cooked salmon fillet",
+  "targets": [
+   "fdc:2706286"
+  ]
+ },
+ {
+  "label": "fish and chips",
+  "prompt": "a photo of fried fish with french fries",
+  "targets": [
+   "fdc:2706244",
+   "search:french fries"
+  ]
+ },
+ {
+  "label": "shrimp",
+  "prompt": "a photo of cooked shrimp",
+  "targets": [
+   "fdc:2706360"
+  ]
+ },
+ {
+  "label": "mashed potatoes",
+  "prompt": "a photo of mashed potatoes",
+  "targets": [
+   "fdc:2709492"
+  ]
+ },
+ {
+  "label": "baked potato",
+  "prompt": "a photo of a baked potato",
+  "targets": [
+   "fdc:2709383"
+  ]
+ },
+ {
+  "label": "poke bowl",
+  "prompt": "a photo of a poke bowl with raw fish over rice",
+  "targets": [
+   "fdc:2706308",
+   "search:rice"
+  ]
+ },
+ {
+  "label": "bibimbap",
+  "prompt": "a photo of korean bibimbap rice bowl",
+  "targets": [
+   "fdc:2708950"
+  ]
+ },
+ {
+  "label": "kimchi",
+  "prompt": "a photo of kimchi",
+  "targets": [
+   "fdc:2710077"
+  ]
+ },
+ {
+  "label": "chow mein",
+  "prompt": "a photo of chow mein stir fried noodles",
+  "targets": [
+   "fdc:2708354"
+  ]
+ },
+ {
+  "label": "paella",
+  "prompt": "a photo of spanish paella with rice and seafood",
+  "targets": [
+   "fdc:2706723"
+  ]
+ },
+ {
+  "label": "risotto",
+  "prompt": "a photo of creamy risotto",
+  "targets": [
+   "search:risotto"
+  ]
+ },
+ {
+  "label": "meatballs",
+  "prompt": "a photo of meatballs in sauce",
+  "targets": [
+   "fdc:2706467"
+  ]
+ },
+ {
+  "label": "roast turkey",
+  "prompt": "a photo of sliced roast turkey",
+  "targets": [
+   "fdc:2706109"
+  ]
+ },
+ {
+  "label": "pork chop",
+  "prompt": "a photo of a cooked pork chop",
+  "targets": [
+   "fdc:2705866"
+  ]
+ },
+ {
+  "label": "latte or cappuccino",
+  "prompt": "a photo of a latte or cappuccino coffee with milk foam",
+  "targets": [
+   "fdc:2710386"
+  ]
+ },
+ {
+  "label": "orange juice",
+  "prompt": "a photo of a glass of orange juice",
+  "targets": [
+   "fdc:169098"
+  ]
+ },
+ {
+  "label": "cola soft drink",
+  "prompt": "a photo of a glass or can of cola soft drink",
+  "targets": [
+   "fdc:174852"
+  ]
+ },
+ {
+  "label": "beer",
+  "prompt": "a photo of a glass of beer",
+  "targets": [
+   "fdc:2710616"
+  ]
+ },
+ {
+  "label": "wine",
+  "prompt": "a photo of a glass of wine",
+  "targets": [
+   "fdc:2710688"
+  ]
+ },
+ {
+  "label": "strawberries",
+  "prompt": "a photo of strawberries",
+  "targets": [
+   "fdc:2709283"
+  ]
+ },
+ {
+  "label": "blueberries",
+  "prompt": "a photo of blueberries",
+  "targets": [
+   "fdc:171711"
+  ]
+ },
+ {
+  "label": "pineapple",
+  "prompt": "a photo of pineapple pieces",
+  "targets": [
+   "fdc:2709260"
+  ]
+ },
+ {
+  "label": "peach or plum",
+  "prompt": "a photo of a peach or plum",
+  "targets": [
+   "fdc:2709249"
+  ]
+ },
+ {
+  "label": "pear",
+  "prompt": "a photo of a pear",
+  "targets": [
+   "fdc:2709254"
+  ]
+ },
+ {
+  "label": "kiwi",
+  "prompt": "a photo of kiwi fruit",
+  "targets": [
+   "fdc:168153"
+  ]
+ },
+ {
+  "label": "cherries",
+  "prompt": "a photo of cherries",
+  "targets": [
+   "fdc:2709231"
+  ]
+ },
+ {
+  "label": "avocado",
+  "prompt": "a photo of an avocado",
+  "targets": [
+   "fdc:2709223"
+  ]
+ },
+ {
+  "label": "broccoli",
+  "prompt": "a photo of broccoli",
+  "targets": [
+   "fdc:170379"
+  ]
+ },
+ {
+  "label": "carrots",
+  "prompt": "a photo of carrots",
+  "targets": [
+   "fdc:2709660"
+  ]
+ },
+ {
+  "label": "corn on the cob",
+  "prompt": "a photo of corn on the cob",
+  "targets": [
+   "search:corn on the cob",
+   "search:sweet corn"
+  ]
+ },
+ {
+  "label": "green beans",
+  "prompt": "a photo of green beans",
+  "targets": [
+   "fdc:2709769"
+  ]
+ },
+ {
+  "label": "cheese slices",
+  "prompt": "a photo of slices of cheese",
+  "targets": [
+   "fdc:173414"
+  ]
+ },
+ {
+  "label": "peanut butter toast",
+  "prompt": "a photo of toast with peanut butter",
+  "targets": [
+   "fdc:2707537"
+  ]
+ },
+ {
+  "label": "pretzels",
+  "prompt": "a photo of pretzels",
+  "targets": [
+   "fdc:2708247"
+  ]
+ },
+ {
+  "label": "granola or protein bar",
+  "prompt": "a photo of a granola bar or protein bar",
+  "targets": [
+   "fdc:2708101"
+  ]
+ },
+ {
+  "label": "mixed nuts",
+  "prompt": "a photo of a handful of mixed nuts",
+  "targets": [
+   "fdc:2707504"
+  ]
+ },
+ {
+  "label": "tortilla chips and salsa",
+  "prompt": "a photo of tortilla chips with salsa",
+  "targets": [
+   "fdc:2708202"
+  ]
+ },
+ {
+  "label": "burger and fries meal",
+  "prompt": "a photo of a burger with french fries",
+  "targets": [
+   "fdc:2706920",
+   "search:french fries"
+  ]
+ },
+ {
+  "label": "pizza slice pepperoni",
+  "prompt": "a photo of a slice of pepperoni pizza",
+  "targets": [
+   "search:pepperoni pizza"
+  ]
+ },
+ {
+  "label": "tofu stir fry",
+  "prompt": "a photo of tofu stir fry with vegetables",
+  "targets": [
+   "fdc:172475"
+  ]
+ },
+ {
+  "label": "couscous",
+  "prompt": "a photo of couscous",
+  "targets": [
+   "fdc:2708441"
+  ]
+ },
+ {
+  "label": "bread rolls",
+  "prompt": "a photo of bread rolls",
+  "targets": [
+   "fdc:2707654"
+  ]
+ },
+ {
+  "label": "baguette",
+  "prompt": "a photo of a baguette",
+  "targets": [
+   "fdc:2707610"
+  ]
  }
 ]

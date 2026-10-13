@@ -114,6 +114,29 @@ export function PortionView(props: {
         <TextField label="Amount" value={qty} onInput={setQty} inputMode="decimal" autocomplete="off" error={qty !== '' ? qtyError : null} autofocus />
         <SelectField label="Unit" value={unit} onChange={setUnit} options={opts.map((o) => ({ value: o.unit, label: o.unit === 'g' ? 'grams (g)' : o.unit }))} />
       </div>
+      {opts.length > 1 || gramsMeaningful ? (
+        <div class="chips" role="group" aria-label="Quick amounts">
+          {opts
+            .filter((o) => o.unit !== 'g')
+            .slice(0, 4)
+            .map((o) => (
+              <button
+                key={o.unit}
+                type="button"
+                class="chip-btn"
+                aria-pressed={unit === o.unit && qty === '1'}
+                onClick={() => { setUnit(o.unit); setQty('1'); }}
+              >
+                1 × {o.unit}{gramsMeaningful ? ` · ${formatGrams(o.gramsPerUnit)}` : ''}
+              </button>
+            ))}
+          {gramsMeaningful ? (
+            <button type="button" class="chip-btn" aria-pressed={unit === 'g' && qty === '100'} onClick={() => { setUnit('g'); setQty('100'); }}>
+              100 g
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <p class="equiv" aria-live="polite">
         {grams !== null && gramsMeaningful ? (
           <>

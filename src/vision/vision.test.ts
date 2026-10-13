@@ -42,8 +42,10 @@ describe('scoring', () => {
     const v = new Array(labelEmbeddings.dim).fill(0).map((_, i) => Math.sin(i));
     expect(real.rank(v, 5)).toHaveLength(5);
     const seed = JSON.parse(readFileSync('src/data/seed/foods.json', 'utf8')).foods as Food[];
-    const ids = new Set(seed.map((f) => f.id));
-    for (const l of labelEmbeddings.labels) for (const t of l.targets) if (!t.startsWith('search:')) expect(ids.has(t), t).toBe(true);
+    const global = JSON.parse(readFileSync('src/data/seed/global.json', 'utf8')).foods as [number][];
+    const ids = new Set([...seed.map((f) => f.id), ...global.map((g) => `fdc:${g[0]}`)]);
+    const labels = JSON.parse(readFileSync('scripts/vision/labels.json', 'utf8')) as { targets: string[] }[];
+    for (const l of [...labelEmbeddings.labels, ...labels]) for (const t of l.targets) if (!t.startsWith('search:')) expect(ids.has(t), t).toBe(true);
   });
 });
 

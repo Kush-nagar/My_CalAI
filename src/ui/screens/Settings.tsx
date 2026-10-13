@@ -7,6 +7,7 @@ import { useApp } from '../store';
 import { useUi } from '../ui';
 import { BackupPanel } from '../backup/BackupPanel';
 import { ModelPanel } from '../vision/ModelPanel';
+import { GoalsCard } from './GoalsCard';
 
 export function SafetyNote() {
   return (
@@ -74,6 +75,8 @@ export function Settings() {
         />
         {under18 ? <SafetyNote /> : <p class="hint">Under 18 turns on safety mode and hides calories by default.</p>}
       </section>
+
+      <GoalsCard />
 
       <section class="card" aria-labelledby="s-disp">
         <h2 id="s-disp">What you see</h2>

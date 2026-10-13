@@ -3,10 +3,13 @@ import { useContext, useEffect, useState } from 'preact/hooks';
 import type { MealSlot } from '../domain/types';
 
 /** Cross-screen UI state: selected diary day, Add flow, refresh counter, polite announcements. */
+/** Which part of the Add sheet to open first. */
+export type AddMode = 'search' | 'camera' | 'quick';
+
 export interface UiApi {
   date: string;
   setDate(d: string): void;
-  openAdd(opts?: { meal?: MealSlot }): void;
+  openAdd(opts?: { meal?: MealSlot; mode?: AddMode }): void;
   /** Bumped after any diary write so screens re-query. */
   version: number;
   bump(): void;
