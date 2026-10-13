@@ -18,14 +18,21 @@ export async function buildOff(work, countries, worldLimit = 250_000) {
   const want = countries.map((c) => c.toLowerCase());
   const out = new Map(want.map((c) => [c, new Map()]));
   let total = 0;
-  const world = [];
+  // Bounded top-N by scan count: prune to worldLimit whenever the buffer doubles, so memory stays flat.
+  let world = [];
+  let minScans = 2;
+  const prune = () => {
+    world.sort((a, b) => b[0] - a[0]);
+    world = world.slice(0, worldLimit * 1.2);
+    minScans = Math.max(minScans, world.at(-1)?.[0] ?? 2);
+  };
   await eachRow(gz, (r) => {
     total++;
     const cs = (r.countries_en || '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
     const hits = want.filter((c) => cs.includes(c));
     const scans = Number(r.unique_scans_n) || 0;
     const usOnly = cs.length === 1 && cs[0] === 'united states';
-    if (!hits.length && (scans < 2 || usOnly)) return;
+    if (!hits.length && (scans < minScans || usOnly)) return;
     const kcal = r['energy-kcal_100g'] !== '' ? r['energy-kcal_100g'] : r['energy_100g'] ? Number(r['energy_100g']) / 4.184 : '';
     const sodiumG = r.sodium_100g;
     const rec = {
@@ -37,15 +44,19 @@ export async function buildOff(work, countries, worldLimit = 250_000) {
       date: r.last_modified_t || '',
     };
     if (!rec.name || !/^\d{6,14}$/.test(r.code || '') || !plausible(rec)) return;
-    if (scans >= 2 && !usOnly) world.push([scans, rec]);
+    if (scans >= minScans && !usOnly) {
+      // Keep only what search and logging need.
+      world.push([scans, { gtin: rec.gtin, name: rec.name, brand: rec.brand, kcal: rec.kcal, protein: rec.protein, carb: rec.carb, fat: rec.fat, fiber: rec.fiber, sugars: rec.sugars, satfat: rec.satfat, sodium_mg: rec.sodium_mg, basis: rec.basis, serving_qty: rec.serving_qty, serving_label: rec.serving_label, ref: rec.ref }]);
+      if (world.length >= worldLimit * 2.4) prune();
+    }
     for (const c of hits) {
       const m = out.get(c);
       const cur = m.get(r.code);
       if (!cur || rec.date > cur.date) m.set(r.code, rec);
     }
   }, { tsv: true, gz: true });
-  console.log('off rows scanned', total, 'world candidates', world.length);
-  world.sort((a, b) => b[0] - a[0]);
+  prune();
+  console.log('off rows scanned', total, 'world candidates kept', world.length, 'min scans', minScans);
   const seen = new Set();
   const top = [];
   for (const [, rec] of world) {
