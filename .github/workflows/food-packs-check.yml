@@ -1,0 +1,33 @@
+name: Food packs check
+# Builds the offline food packs (USDA Branded CC0, Open Food Facts India ODbL) and commits only a
+# small stats file, so pack changes can be checked without committing the large pack files.
+# The real packs are built fresh by the Pages deploy workflow.
+on:
+  workflow_dispatch:
+  push:
+    paths: ['scripts/packs/**', '!scripts/packs/last-build.json', '.github/workflows/food-packs-check.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/packs/build-packs.mjs "$RUNNER_TEMP/packs"
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+      - name: Sample rows
+        run: for f in public/packs/*/00.txt; do echo "== $f"; sed -n '1,4p' "$f"; done; du -sh public/packs/*
+      - name: Commit stats
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p scripts/packs/samples
+          for d in public/packs/*/; do id=$(basename "$d"); [ -f "$d/00.txt" ] && awk 'NR==1 || NR%4000==2' "$d/00.txt" | head -12 > "scripts/packs/samples/$id.txt"; done
+          git add scripts/packs/last-build.json scripts/packs/samples
+          git diff --cached --quiet || git commit -m "packs: build stats"
+          git pull --rebase
+          git push
