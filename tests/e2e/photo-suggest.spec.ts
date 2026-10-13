@@ -61,7 +61,7 @@ test('opt-in download, offline suggestions, confirm before logging, removal fall
   await page.locator('.add-fab').click();
   await page.getByRole('tab', { name: 'Photo' }).click();
   await page.locator('input[type=file][accept="image/*"]').setInputFiles({ name: 'meal.png', mimeType: 'image/png', buffer: photo });
-  await page.getByRole('button', { name: 'Suggest food names' }).click();
+  // With the model ready, a new photo is looked at straight away (no extra tap).
   await expect(page.getByText(/Possible matches|can't tell what this is/)).toBeVisible({ timeout: 60_000 });
   await page.screenshot({ path: 'test-results/shots/suggest-review.png', fullPage: true });
 
@@ -78,7 +78,7 @@ test('opt-in download, offline suggestions, confirm before logging, removal fall
   await expect(page.getByRole('textbox', { name: 'Amount', exact: true })).toHaveValue('');
   expect(await entryCount(page)).toBe(0);
   await page.getByRole('textbox', { name: 'Amount', exact: true }).fill('1');
-  await page.getByRole('button', { name: /^Add to (Breakfast|Lunch|Dinner|Snacks)$/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Add to (Breakfast|Lunch|Dinner|Snacks)$/ }).click();
   await expect.poll(() => entryCount(page)).toBe(1);
 
   // No network at all while offline (requests list only grows with same-origin SW-served URLs).
@@ -93,7 +93,8 @@ test('opt-in download, offline suggestions, confirm before logging, removal fall
   await page.locator('.add-fab').click();
   await page.getByRole('tab', { name: 'Photo' }).click();
   await expect(page.getByText(/Optional: suggest food names from a photo/)).toBeVisible();
-  await expect(page.getByText('Take or choose a photo')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open camera' })).toBeVisible();
+  await expect(page.getByText('Choose from library')).toBeVisible();
   await context.setOffline(false);
 });
 
@@ -122,6 +123,7 @@ test('evicted model falls back gracefully', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Download again' })).toBeVisible();
   await page.locator('.add-fab').click();
   await page.getByRole('tab', { name: 'Photo' }).click();
-  await expect(page.getByText('Take or choose a photo')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open camera' })).toBeVisible();
+  await expect(page.getByText('Choose from library')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Suggest food names' })).toHaveCount(0);
 });

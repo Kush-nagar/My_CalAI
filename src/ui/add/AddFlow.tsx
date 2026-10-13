@@ -8,6 +8,7 @@ import { foodFromEntry, formatNutrient, mealLabel, portionLabel } from '../helpe
 import { caloriesVisible, useApp } from '../store';
 import { navigate, useUi, type AddMode } from '../ui';
 import type { ComponentType } from 'preact';
+import { createPortal } from 'preact/compat';
 import type { BarcodeSheetProps } from '../barcode/BarcodeSheet';
 import { CustomFoodForm } from '../screens/CustomFoodForm';
 import { FoodRow } from './FoodRow';
@@ -448,7 +449,7 @@ export function AddFlow(props: { initialMeal: MealSlot; initialMode?: AddMode; o
       <Sheet title={title} onClose={props.onClose} back={back} hold={scanOpen || camOpen} focusKey={step.kind}>
         {body()}
       </Sheet>
-      {camOpen ? (
+      {camOpen ? createPortal(
         <div class="ext-layer">
           <CameraCapture
             onCapture={(b) => void takePhoto(b)}
@@ -460,9 +461,10 @@ export function AddFlow(props: { initialMeal: MealSlot; initialMode?: AddMode; o
             }}
             onClose={() => setCamOpen(false)}
           />
-        </div>
+        </div>,
+        document.body,
       ) : null}
-      {scanOpen && Scanner ? (
+      {scanOpen && Scanner ? createPortal(
         <div class="ext-layer">
           <Scanner
             onClose={() => setScanOpen(false)}
@@ -475,7 +477,8 @@ export function AddFlow(props: { initialMeal: MealSlot; initialMode?: AddMode; o
               setStep({ kind: 'custom', barcode });
             }}
           />
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </>
   );

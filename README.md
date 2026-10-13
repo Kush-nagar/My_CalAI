@@ -1,10 +1,15 @@
-# Thali — private food journal for Indian home food
+# Thali — private food journal for every cuisine
 
 An installable, offline-first web app (PWA) for logging what you eat. No account, no server, no analytics.
 Your diary, recipes and photos stay in your browser's storage on your device.
 
-- **Log food fast:** search 381 bundled foods by English, Hindi or regional names and spellings (dal/daal, roti/chapathi,
-  भिंडी), recents, favourites, custom foods, and barcode scan.
+- **Tracker dashboard:** week strip, calorie ring (eaten / left against your own optional reference), protein, carbs
+  and fat bars, and water tracking with one-tap +250/+500 ml.
+- **Any food, any cuisine:** about 13,700 bundled USDA foods (smoothies, protein powder, pasta, sushi, burgers…) plus
+  curated Indian foods searchable by Hindi and regional names (dal/daal, roti/chapathi, भिंडी). Quick add for
+  calories and macros, recipes from ingredient weights, barcode scan, recents and favourites.
+- **Meal camera:** full-screen camera; with the optional on-device model it suggests possible foods right after
+  the shot (you confirm each food and amount).
 - **Your recipes:** enter ingredient weights, the weighed cooked yield and servings, and Thali calculates nutrients per
   100 g or per serving, showing its working.
 - **Honest numbers:** every value shows where it came from (USDA FoodData Central, package label, your recipe, your

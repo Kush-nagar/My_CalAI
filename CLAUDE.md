@@ -32,8 +32,15 @@ installed taste/UI skill (`design-taste-frontend` / `taste-ui`) for all frontend
   precached). Suggestions are our own labels only; never show scores/confidence, never prefill amounts,
   never estimate calories/portions/oil, never save without the user confirming each food. Not yet
   verified on a real iPhone — do not claim it works there until it has been.
-- Under-18 mode: no calorie targets, deficit/weight-loss messaging, streaks, scores, body
-  comparison or exercise-to-earn-food; calories hidden by default; neutral education only.
+- Daily references (owner request, 2026-10-13): adults may set their own optional calorie/macro/water
+  references shown as a calorie ring and macro bars ("left" / "above", never red, never shame). The
+  app only offers a maintenance estimate (Mifflin-St Jeor) and an AMDR-based macro split; it never
+  prescribes a deficit or weight-loss plan.
+- Under-18 mode: no calorie or macro targets (water reference only), no deficit/weight-loss messaging,
+  streaks, scores, body comparison or exercise-to-earn-food; calories hidden by default; neutral
+  education only.
+- Coverage is worldwide: curated Indian foods (`seed/foods.json`) + every other USDA FDC food
+  (`seed/global.json`, built by `scripts/data/build-global.mjs`), quick add, recipes, OFF barcodes.
 - No Cal AI branding, names, graphics or layouts.
 
 ## Architecture

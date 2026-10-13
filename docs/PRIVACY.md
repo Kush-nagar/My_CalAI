@@ -161,6 +161,11 @@ The UI worker's screens were not part of this audit. Check them against these ru
 4. In the browser's devtools Network tab, use the app offline and online with lookup off: there
    should be no requests except app files.
 
+## Water and daily references
+Water drinks (amount and time) are stored in IndexedDB `kv` under `water`; daily references are part of
+the settings. Both stay on the device and are included in backups. Under-18 mode stores no calorie or
+macro references.
+
 ## Photo suggestions (optional)
 - Off by default. Nothing model-related is downloaded until you choose "Set up photo suggestions" and confirm the size.
 - The model (≈63 MB) and runtime (≈27 MB) download from Thali's own website into Cache Storage

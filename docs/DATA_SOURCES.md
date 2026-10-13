@@ -192,3 +192,12 @@ These have no USDA record, or no record close enough to alias:
 - **Open Food Facts.** OFF is under ODbL, a share-alike licence, and is community-contributed with
   variable quality. Bundling it would add share-alike obligations to the catalog. It stays an opt-in,
   user-triggered barcode lookup at runtime only.
+
+## Worldwide catalog (added 2026-10-13)
+`src/data/seed/global.json` holds every other food in the same three USDA FoodData Central releases
+(SR Legacy 2018-04, FNDDS 2024-10-31, Foundation 2026-04-30): **13,338 foods** from all cuisines,
+including drinks, supplements, fast food and packaged items. It is built by
+`scripts/data/build-global.mjs` from `scripts/data/raw/usda-extract.json.gz` with the same nutrient
+mapping, missing-value handling (null with reason, never 0) and USDA portion weights as the curated
+seed. Names are USDA descriptions; curated and personal foods rank first in search. Licence: CC0 1.0
+(public domain), citation requested. FNDDS dishes are US standard recipes and are labelled so.

@@ -5,8 +5,9 @@ Until the real-device checklist below passes, treat it as experimental. It is of
 
 ## What it does and doesn't do
 - After you opt in and download the model, Thali can look at a meal photo **on your device** and list
-  a few *possible* food names from its own label list (184 labels: Indian dishes across regions plus
-  common global foods). Each name maps to foods already in Thali's catalog, to your own foods and
+  a few *possible* food names from its own label list (280 labels: Indian dishes across regions plus
+  about 100 common global dishes, drinks and fruit). With the model set up, suggestions start right
+  after you take a photo with the in-app camera. Each name maps to foods already in Thali's catalog, to your own foods and
   recipes with a matching name, or to a search.
 - You tick the foods you actually see, then enter the amount for each one on the normal amount screen.
   The amount starts empty. Nothing is saved until you press "Add to …" for each food.
