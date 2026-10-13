@@ -212,6 +212,10 @@ searched and barcode-matched on the device. Built fresh at each deploy by `scrip
 | Open Food Facts — India | Open Food Facts CSV export | ODbL 1.0 (database), DbCL (contents) | ≈1,700 products with usable nutrition | Community-contributed; quality varies. |
 | Open Food Facts — popular worldwide | Open Food Facts CSV export | ODbL 1.0, DbCL | up to 250,000 most-scanned products, excluding US-only items | Community-contributed; quality varies. |
 
+Measured on the full 2026-10-13 build (CI, Node 22): all three packs together = 682,846 products, index
+built in ≈1 s, ≈317 MB of memory after garbage collection, searches 6–77 ms. On an iPhone, install only the
+packs you need (USDA alone is about two-thirds of that); real-device memory has not been measured yet.
+
 Quality filter (all packs): a product needs energy or all of protein/carbs/fat; energy ≤ 950 kcal/100 g;
 each macro ≤ 100 g/100 g; protein+carbs+fat ≤ 105 g; and when all four are present, energy must agree
 with 4/4/9 kcal per gram within max(60 kcal, 35%). Failing rows are dropped, never "fixed". Missing
