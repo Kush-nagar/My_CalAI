@@ -5,7 +5,18 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { eachRow, plausible } from './lib.mjs';
 
+// V8 keeps a split() substring pointing at its parent line; OFF lines are several KB (ingredients),
+// so every kept field must be copied or the whole export stays in memory.
+const own = (v) => (typeof v === 'string' && v !== '' ? Buffer.from(v, 'utf8').toString('utf8') : v);
+
 const URL_CSV = 'https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz';
+
+/** Detached copy of only the fields a pack needs. */
+function compact(rec) {
+  const o = {};
+  for (const k of ['gtin', 'name', 'brand', 'kcal', 'protein', 'carb', 'fat', 'fiber', 'sugars', 'satfat', 'sodium_mg', 'basis', 'serving_qty', 'serving_label', 'ref', 'date']) o[k] = own(rec[k]);
+  return o;
+}
 
 /**
  * One pass over the Open Food Facts export. Returns per-country packs plus a "world" pack of the
@@ -46,13 +57,13 @@ export async function buildOff(work, countries, worldLimit = 250_000) {
     if (!rec.name || !/^\d{6,14}$/.test(r.code || '') || !plausible(rec)) return;
     if (scans >= minScans && !usOnly) {
       // Keep only what search and logging need.
-      world.push([scans, { gtin: rec.gtin, name: rec.name, brand: rec.brand, kcal: rec.kcal, protein: rec.protein, carb: rec.carb, fat: rec.fat, fiber: rec.fiber, sugars: rec.sugars, satfat: rec.satfat, sodium_mg: rec.sodium_mg, basis: rec.basis, serving_qty: rec.serving_qty, serving_label: rec.serving_label, ref: rec.ref }]);
+      world.push([scans, compact(rec)]);
       if (world.length >= worldLimit * 2.4) prune();
     }
     for (const c of hits) {
       const m = out.get(c);
       const cur = m.get(r.code);
-      if (!cur || rec.date > cur.date) m.set(r.code, rec);
+      if (!cur || rec.date > cur.date) m.set(own(r.code), compact(rec));
     }
   }, { tsv: true, gz: true });
   prune();
