@@ -8,6 +8,9 @@ Your diary, recipes and photos stay in your browser's storage on your device.
 - **Any food, any cuisine:** about 13,700 bundled USDA foods (smoothies, protein powder, pasta, sushi, burgers…) plus
   curated Indian foods searchable by Hindi and regional names (dal/daal, roti/chapathi, भिंडी). Quick add for
   calories and macros, recipes from ingredient weights, barcode scan, recents and favourites.
+- **Branded and packaged foods (optional download):** about 431,000 US products from USDA FoodData Central and
+  up to 250,000 popular products worldwide plus Indian brands from Open Food Facts, searchable and barcode-scannable
+  offline once downloaded.
 - **Meal camera:** full-screen camera; with the optional on-device model it suggests possible foods right after
   the shot (you confirm each food and amount).
 - **Your recipes:** enter ingredient weights, the weighed cooked yield and servings, and Thali calculates nutrients per

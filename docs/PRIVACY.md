@@ -161,6 +161,12 @@ The UI worker's screens were not part of this audit. Check them against these ru
 4. In the browser's devtools Network tab, use the app offline and online with lookup off: there
    should be no requests except app files.
 
+## Offline food databases (optional)
+Packs are downloaded from this app's own website only after you choose them in Settings, stored in Cache
+Storage (`model-cache:pack-*`), and searched in a Web Worker on the device. Searches and barcode scans
+against packs never leave the device. The only third-party call remains the opt-in Open Food Facts barcode
+lookup when a barcode isn't found locally.
+
 ## Water and daily references
 Water drinks (amount and time) are stored in IndexedDB `kv` under `water`; daily references are part of
 the settings. Both stay on the device and are included in backups. Under-18 mode stores no calorie or

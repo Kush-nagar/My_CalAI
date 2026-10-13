@@ -201,3 +201,28 @@ including drinks, supplements, fast food and packaged items. It is built by
 mapping, missing-value handling (null with reason, never 0) and USDA portion weights as the curated
 seed. Names are USDA descriptions; curated and personal foods rank first in search. Licence: CC0 1.0
 (public domain), citation requested. FNDDS dishes are US standard recipes and are labelled so.
+
+## Optional offline food databases ("food packs", added 2026-10-13)
+Downloaded only when you choose them in Settings › Food databases, from this app's own website, then
+searched and barcode-matched on the device. Built fresh at each deploy by `scripts/packs/` (GitHub Actions).
+
+| Pack | Source | Licence | Size (2026-10-13 build) | Notes |
+|---|---|---|---|---|
+| USDA branded foods | USDA FoodData Central — Branded Foods (`FoodData_Central_branded_food_csv_2026-04-30`) | CC0 1.0 (public domain), citation requested | 431,128 products (from 1,984,629 records), ≈52 MB uncompressed | Manufacturer-submitted label data, mostly US market. Latest record per barcode; discontinued items dropped. |
+| Open Food Facts — India | Open Food Facts CSV export | ODbL 1.0 (database), DbCL (contents) | ≈1,700 products with usable nutrition | Community-contributed; quality varies. |
+| Open Food Facts — popular worldwide | Open Food Facts CSV export | ODbL 1.0, DbCL | up to 250,000 most-scanned products, excluding US-only items | Community-contributed; quality varies. |
+
+Quality filter (all packs): a product needs energy or all of protein/carbs/fat; energy ≤ 950 kcal/100 g;
+each macro ≤ 100 g/100 g; protein+carbs+fat ≤ 105 g; and when all four are present, energy must agree
+with 4/4/9 kcal per gram within max(60 kcal, 35%). Failing rows are dropped, never "fixed". Missing
+values stay unknown. Liquids labelled per 100 ml are logged by ml servings, never converted to grams.
+
+### Databases that were considered but cannot be used
+- **NCC Food and Nutrient Database (NCCDB, University of Minnesota):** licensed case by case for a fee,
+  with terms that forbid sharing data beyond the licence scope
+  ([licensing](https://www.ncc.umn.edu/products/licensing-the-database)). That conflicts with this app's
+  $0 rule and with serving data from a public website. Not used.
+- **MyFitnessPal's database:** proprietary and largely user-submitted; there is no licence to reuse it.
+  Its generic-food entries largely come from USDA data, which Thali already includes. Not used.
+- **Nutritionix, Edamam, FatSecret APIs:** need accounts/API keys, restrict caching, and would send your
+  searches to a third party. Not used.
