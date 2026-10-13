@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { entriesForDate } from '../../db/repo';
 import { sumTotals } from '../../domain/nutrition';
-import { localDateOf, shiftDate } from '../../domain/portion';
+import { localDateOf } from '../../domain/portion';
 import { MEAL_SLOTS, type MealEntry } from '../../domain/types';
 import { EmptyState, EstimateBadge, SourceChip } from '../components';
 import { Icon } from '../icons';
@@ -9,6 +9,7 @@ import { dayHeading, formatNutrient, groupByMeal, nutrientMeta, portionLabel } f
 import { caloriesVisible, useApp } from '../store';
 import { useUi } from '../ui';
 import { EntrySheet } from '../add/EntrySheet';
+import { DailyCard, DateStrip, WaterCard } from './Dashboard';
 
 export function Today() {
   const { state } = useApp();
@@ -36,9 +37,6 @@ export function Today() {
   return (
     <section aria-labelledby="day-h" class="screen">
       <header class="day-head">
-        <button type="button" class="icon-btn" onClick={() => ui.setDate(shiftDate(ui.date, -1))} aria-label="Previous day">
-          <Icon name="back" />
-        </button>
         <div class="day-title">
           <h1 id="day-h">{h.main}</h1>
           <p class="day-sub">{h.sub}</p>
@@ -46,21 +44,28 @@ export function Today() {
         {ui.date !== today ? (
           <button type="button" class="btn btn-tonal btn-sm" onClick={() => ui.setDate(today)}>Today</button>
         ) : null}
-        <button type="button" class="icon-btn" onClick={() => ui.setDate(shiftDate(ui.date, 1))} aria-label="Next day">
-          <Icon name="next" />
+        <button type="button" class="icon-btn cam-btn" onClick={() => ui.openAdd({ mode: 'camera' })} aria-label="Log a meal with the camera">
+          <Icon name="camera" />
         </button>
       </header>
+      <DateStrip />
 
       {entries === null ? (
         <p class="hint pad" aria-busy="true">Loading…</p>
-      ) : entries.length === 0 ? (
-        <EmptyState
-          title={ui.date === today ? 'Nothing logged yet' : 'Nothing logged this day'}
-          body="Add the first food you ate. Search the catalog, re-log something recent, or enter a package label."
-          action={<button type="button" class="btn btn-primary" onClick={() => ui.openAdd()}><Icon name="plus" size={20} /> Add food</button>}
-        />
       ) : (
         <>
+          <DailyCard totals={totals} />
+          <WaterCard />
+
+          {entries.length === 0 ? (
+            <EmptyState
+              title={ui.date === today ? 'Nothing logged yet' : 'Nothing logged this day'}
+              body="Search any food from any cuisine, scan a barcode, snap a photo, or quick-add calories."
+              action={<button type="button" class="btn btn-primary" onClick={() => ui.openAdd()}><Icon name="plus" size={20} /> Add food</button>}
+            />
+          ) : (
+            <details class="more-nutr">
+              <summary>More nutrients</summary>
           <section class="summary" aria-label="Nutrient summary for this day">
             <dl class="summary-grid">
               {shown.map((c) => {
@@ -95,6 +100,8 @@ export function Today() {
               <p class="hint foot"><Icon name="info" size={14} /> ≥ means “at least”: some logged foods do not report that nutrient, so the true total could be higher.</p>
             ) : null}
           </section>
+            </details>
+          )}
 
           {MEAL_SLOTS.map((m) => {
             const list = groups[m.id];

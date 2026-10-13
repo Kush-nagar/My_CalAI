@@ -73,6 +73,7 @@ async function seed(db: Ledger) {
     tx.objectStore('images').put({ id: 'img1', mime: 'image/png', createdAt: '2026-10-01T07:31:00.000Z', blob: new Blob([PNG], { type: 'image/png' }) }),
     tx.objectStore('kv').put(settings, 'settings'),
     tx.objectStore('kv').put(['c:dal'], 'favorites'),
+    tx.objectStore('kv').put([{ id: 'w1', localDate: '2026-10-01', ml: 250, at: '2026-10-01T08:00:00.000Z' }], 'water'),
   ]);
   await tx.done;
 }
@@ -85,6 +86,7 @@ async function snapshot(db: Ledger) {
     recipes: await db.getAll('recipes'),
     settings: await db.get('kv', 'settings'),
     favorites: await db.get('kv', 'favorites'),
+    water: await db.get('kv', 'water'),
     images: await Promise.all(
       images.map(async (i: ImageAsset) => ({ id: i.id, mime: i.mime, createdAt: i.createdAt, bytes: Array.from(new Uint8Array(await i.blob.arrayBuffer())) })),
     ),
@@ -357,7 +359,37 @@ describe('atomicity', () => {
 
   it('refuses staged data that did not come from validateArchive', async () => {
     const b = await freshDb();
-    const fake: StagedRestore = { schemaVersion: 1, entries: [], foods: [], recipes: [], settings: null, favorites: null, images: [] };
+    const fake: StagedRestore = { schemaVersion: 1, entries: [], foods: [], recipes: [], settings: null, favorites: null, water: null, images: [] };
     await expect(commitRestore(b, fake, 'replace')).rejects.toThrow(/not validated/);
+  });
+});
+
+describe('water and goals', () => {
+  it('merges water drinks by id and keeps existing ones', async () => {
+    const a = await freshDb();
+    await seed(a);
+    const v = await validateArchive(await exportArchive(a, { includePhotos: false }));
+    expect(v.ok).toBe(true);
+    if (!v.ok) return;
+    const b = await freshDb();
+    await b.put('kv', [{ id: 'w9', localDate: '2026-10-02', ml: 500, at: '2026-10-02T08:00:00.000Z' }], 'water');
+    await commitRestore(b, v.staged, 'merge');
+    expect(((await b.get('kv', 'water')) as { id: string }[]).map((w) => w.id).sort()).toEqual(['w1', 'w9']);
+  });
+
+  it('rejects implausible water amounts and goals', async () => {
+    const a = await plainArchive(false);
+    a.data.kv.water = [{ id: 'w1', localDate: '2026-10-01', ml: 99999, at: '2026-10-01T08:00:00.000Z' }];
+    await expectRejected(await rehash(a), /water/);
+    const b = await plainArchive(false);
+    b.data.kv.settings = { ...b.data.kv.settings, goals: { energy_kcal: -5, protein_g: null, carb_g: null, fat_g: null, water_ml: 2000 } };
+    await expectRejected(await rehash(b), /goals/);
+  });
+
+  it('accepts backups made before water tracking existed', async () => {
+    const a = await plainArchive(false);
+    delete a.data.kv.water;
+    const v = await validateArchive(await rehash(a));
+    expect(v.ok).toBe(true);
   });
 });

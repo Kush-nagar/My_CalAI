@@ -1,4 +1,4 @@
-import type { Food, ImageAsset, MealEntry, Recipe } from '../domain/types';
+import type { Food, ImageAsset, MealEntry, Recipe, WaterLog } from '../domain/types';
 import type { Ledger } from './db';
 
 // Repository: the only place UI touches persistence. Every write is one IDB transaction.
@@ -127,5 +127,33 @@ export async function deleteEverything(db: Ledger): Promise<void> {
   const stores = ['foods', 'recipes', 'entries', 'images', 'kv'] as const;
   const tx = db.transaction([...stores], 'readwrite');
   await Promise.all(stores.map((s) => tx.objectStore(s).clear()));
+  await tx.done;
+}
+
+// ---- Water (kv "water": list of drinks; small, so one record keeps backup simple) ----------
+
+export const MAX_DRINK_ML = 5000;
+
+export async function allWater(db: Ledger): Promise<WaterLog[]> {
+  return ((await db.get('kv', 'water')) as WaterLog[] | undefined) ?? [];
+}
+
+export async function waterForDate(db: Ledger, localDate: string): Promise<WaterLog[]> {
+  return (await allWater(db)).filter((w) => w.localDate === localDate);
+}
+
+export async function addWater(db: Ledger, w: WaterLog): Promise<void> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(w.localDate)) throw new Error('Invalid date');
+  if (!(w.ml > 0 && w.ml <= MAX_DRINK_ML)) throw new Error(`Enter between 1 and ${MAX_DRINK_ML} ml`);
+  const tx = db.transaction('kv', 'readwrite');
+  const cur = ((await tx.store.get('water')) as WaterLog[] | undefined) ?? [];
+  await tx.store.put([...cur, w], 'water');
+  await tx.done;
+}
+
+export async function deleteWater(db: Ledger, id: string): Promise<void> {
+  const tx = db.transaction('kv', 'readwrite');
+  const cur = ((await tx.store.get('water')) as WaterLog[] | undefined) ?? [];
+  await tx.store.put(cur.filter((w) => w.id !== id), 'water');
   await tx.done;
 }

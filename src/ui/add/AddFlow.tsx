@@ -6,25 +6,29 @@ import { Segmented, Sheet, Switch, useObjectUrl } from '../components';
 import { Icon, type IconName } from '../icons';
 import { foodFromEntry, formatNutrient, mealLabel, portionLabel } from '../helpers';
 import { caloriesVisible, useApp } from '../store';
-import { navigate, useUi } from '../ui';
+import { navigate, useUi, type AddMode } from '../ui';
 import type { ComponentType } from 'preact';
+import { createPortal } from 'preact/compat';
 import type { BarcodeSheetProps } from '../barcode/BarcodeSheet';
 import { CustomFoodForm } from '../screens/CustomFoodForm';
 import { FoodRow } from './FoodRow';
 import { PortionView } from './PortionView';
+import { QuickAdd } from './QuickAdd';
+import { CameraCapture } from '../vision/CameraCapture';
 import type { Candidate } from '../../vision/match';
 import { ModelPanel } from '../vision/ModelPanel';
 import { SuggestionReview } from '../vision/SuggestionReview';
 import { refreshModelStatus, useModelStatus } from '../vision/model';
 import { getRecognizer, resetRecognizer } from '../vision/suggest';
 
-type Tab = 'search' | 'recent' | 'favs' | 'barcode' | 'photo';
+type Tab = 'search' | 'recent' | 'favs' | 'quick' | 'barcode' | 'photo';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'search', label: 'Search', icon: 'search' },
+  { id: 'photo', label: 'Photo', icon: 'camera' },
+  { id: 'barcode', label: 'Barcode', icon: 'barcode' },
+  { id: 'quick', label: 'Quick add', icon: 'bolt' },
   { id: 'recent', label: 'Recent', icon: 'clock' },
   { id: 'favs', label: 'Favourites', icon: 'star' },
-  { id: 'barcode', label: 'Barcode', icon: 'barcode' },
-  { id: 'photo', label: 'Photo', icon: 'camera' },
 ];
 
 type Step =
@@ -53,11 +57,12 @@ async function shrink(file: Blob): Promise<Blob | null> {
   }
 }
 
-export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
+export function AddFlow(props: { initialMeal: MealSlot; initialMode?: AddMode; onClose(): void }) {
   const { state, actions } = useApp();
   const ui = useUi();
   const showKcal = caloriesVisible(state.settings);
-  const [tab, setTab] = useState<Tab>('search');
+  const [tab, setTab] = useState<Tab>(props.initialMode === 'camera' ? 'photo' : props.initialMode === 'quick' ? 'quick' : 'search');
+  const [camOpen, setCamOpen] = useState(props.initialMode === 'camera');
   const [query, setQuery] = useState('');
   const [meal, setMeal] = useState<MealSlot>(props.initialMeal);
   const [step, setStep] = useState<Step>({ kind: 'list' });
@@ -92,7 +97,13 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
     if (tab === 'favs' && favs === null) getFavorites(state.db).then(setFavs, () => setFavs([]));
   }, [tab]);
 
-  const hits = useMemo(() => (query.trim() ? state.index.search(query, 40) : []), [query, state.index]);
+  // The catalog has ~13,700 foods: debounce so typing stays smooth on a phone.
+  const [q, setQ] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setQ(query), query.length < 2 ? 0 : 120);
+    return () => clearTimeout(t);
+  }, [query]);
+  const hits = useMemo(() => (q.trim() ? state.index.search(q, 40) : []), [q, state.index]);
   const pick = (food: Food) => setStep({ kind: 'portion', food });
 
   async function relog(e: MealEntry) {
@@ -112,15 +123,15 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
     }
   }
 
-  async function suggest() {
-    if (!photo) return;
+  async function suggest(p: Blob | null = photo) {
+    if (!p) return;
     setSuggestErr(null);
     setSuggesting(true);
     ui.announce('Looking at your photo on this device');
     const run = ++suggestRun.current;
     try {
       const rec = await getRecognizer();
-      const ranked = await rec.suggest(photo, { parts });
+      const ranked = await rec.suggest(p, { parts });
       const [{ toCandidates }, { isUnsure }] = await Promise.all([import('../../vision/match'), import('../../vision/scoring')]);
       if (run !== suggestRun.current) return; // cancelled meanwhile: ignore late results
       const candidates = toCandidates(ranked, state.foodsById, state.index);
@@ -330,6 +341,8 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
             </div>
           ) : null}
 
+          {tab === 'quick' ? <QuickAdd meal={meal} onMeal={setMeal} onSaved={props.onClose} /> : null}
+
           {tab === 'photo' ? (
             <div class="pad stack">
               {photoUrl ? (
@@ -337,10 +350,15 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
                   <img src={photoUrl} alt="Your meal photo, shown only on this device" />
                 </figure>
               ) : null}
-              <label class="btn btn-secondary file-btn">
-                <Icon name="camera" size={20} /> {photo ? 'Choose a different photo' : 'Take or choose a photo'}
-                <input type="file" accept="image/*" class="sr-only-input" onChange={(e) => void onFile(e)} />
-              </label>
+              <div class="btn-row">
+                <button type="button" class={'btn ' + (photo ? 'btn-secondary' : 'btn-primary')} onClick={() => setCamOpen(true)}>
+                  <Icon name="camera" size={20} /> {photo ? 'Retake' : 'Open camera'}
+                </button>
+                <label class="btn btn-secondary file-btn">
+                  <Icon name="image" size={20} /> {photo ? 'Choose a different photo' : 'Choose from library'}
+                  <input type="file" accept="image/*" class="sr-only-input" onChange={(e) => void onFile(e)} />
+                </label>
+              </div>
               <p class="hint">
                 {state.settings.keepPhotos
                   ? 'The photo is saved with your entry on this device only.'
@@ -408,22 +426,45 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
   }
   async function onFile(e: Event) {
     const f = (e.target as HTMLInputElement).files?.[0];
-    if (!f) return;
-    const img = await shrink(f);
+    if (f) await takePhoto(f);
+  }
+
+  /** New photo from camera or library: attach it, and look for matches right away when set up. */
+  async function takePhoto(raw: Blob) {
+    setCamOpen(false);
+    setTab('photo');
+    const img = await shrink(raw);
     if (!img) {
       ui.announce('This photo format could not be read, so it was not attached.');
       return;
     }
     setPhoto(img);
+    setPhotoUsed(false);
     ui.announce('Photo attached');
+    if (state.settings.photoSuggestions && model.kind === 'ready') void suggest(img);
   }
 
   return (
     <>
-      <Sheet title={title} onClose={props.onClose} back={back} hold={scanOpen} focusKey={step.kind}>
+      <Sheet title={title} onClose={props.onClose} back={back} hold={scanOpen || camOpen} focusKey={step.kind}>
         {body()}
       </Sheet>
-      {scanOpen && Scanner ? (
+      {camOpen ? createPortal(
+        <div class="ext-layer">
+          <CameraCapture
+            onCapture={(b) => void takePhoto(b)}
+            onLibrary={(f) => void takePhoto(f)}
+            onBarcode={() => {
+              setCamOpen(false);
+              setTab('barcode');
+              setScanOpen(true);
+            }}
+            onClose={() => setCamOpen(false)}
+          />
+        </div>,
+        document.body,
+      ) : null}
+      {scanOpen && Scanner ? createPortal(
         <div class="ext-layer">
           <Scanner
             onClose={() => setScanOpen(false)}
@@ -436,7 +477,8 @@ export function AddFlow(props: { initialMeal: MealSlot; onClose(): void }) {
               setStep({ kind: 'custom', barcode });
             }}
           />
-        </div>
+        </div>,
+        document.body,
       ) : null}
     </>
   );

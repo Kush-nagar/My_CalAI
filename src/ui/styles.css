@@ -13,6 +13,10 @@
   --caution: #8c5b16;
   --caution-bg: #fbf1dc;
   --error: #a13d36;
+  --protein: #2f6f8f;
+  --carb: #b5761c;
+  --fat: #8a4f7d;
+  --water: #2a7f8c;
   --scrim: rgba(23, 27, 24, 0.45);
   --shadow: 0 1px 2px rgba(34, 38, 32, 0.06), 0 6px 20px rgba(34, 38, 32, 0.08);
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -35,6 +39,10 @@
     --caution: #f0c578;
     --caution-bg: #3a3020;
     --error: #f1a49d;
+    --protein: #86bfdb;
+    --carb: #e6b45e;
+    --fat: #d4a2ca;
+    --water: #7fcad3;
     --scrim: rgba(0, 0, 0, 0.6);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
@@ -54,6 +62,10 @@
   --caution: #f0c578;
   --caution-bg: #3a3020;
   --error: #f1a49d;
+  --protein: #86bfdb;
+  --carb: #e6b45e;
+  --fat: #d4a2ca;
+  --water: #7fcad3;
   --scrim: rgba(0, 0, 0, 0.6);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.35);
   color-scheme: dark;
@@ -385,3 +397,61 @@ details.block > summary { font-weight: 600; min-height: 2.75rem; display: flex; 
 .cand-food { align-items: flex-start; padding: 0.25rem 0; }
 .cand-food input { margin-top: 0.125rem; flex: none; }
 .cand-name { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: center; min-width: 0; overflow-wrap: anywhere; }
+
+/* Dashboard (Today) */
+.day-head .day-title { flex: 1; }
+.cam-btn { background: var(--forest); color: var(--on-forest); border-radius: 50%; }
+.datestrip { display: flex; align-items: center; gap: 0.125rem; }
+.ds-days { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
+.ds-day { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.125rem; min-height: 3.5rem; border-radius: 0.75rem; border: 1px solid transparent; background: none; color: var(--secondary); padding: 0; }
+.ds-wd { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.ds-d { font-size: 1rem; font-weight: 600; color: var(--ink); }
+.ds-day.today .ds-d { text-decoration: underline; text-decoration-color: var(--turmeric); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.ds-day.on { background: var(--forest); border-color: var(--forest); }
+.ds-day.on .ds-wd, .ds-day.on .ds-d { color: var(--on-forest); }
+.daily { gap: 1rem; }
+.daily-top { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+.ring { position: relative; flex: none; }
+.ring svg { width: 100%; height: 100%; display: block; }
+.ring-arc { transition: stroke-dasharray 220ms ease-out; }
+.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.ring-num { font-size: 1.75rem; line-height: 2.125rem; font-weight: 700; letter-spacing: -0.01em; }
+.ring-cap { font-size: 0.8125rem; color: var(--secondary); }
+.daily-stats { display: flex; flex-direction: column; gap: 0.5rem; margin: 0; flex: 1; min-width: 8rem; }
+.daily-stats dt { font-size: 0.8125rem; color: var(--secondary); }
+.daily-stats dd { margin: 0; font-size: 1.0625rem; font-weight: 600; }
+.macros { display: flex; flex-direction: column; gap: 0.75rem; }
+.macro-line { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.macro-label { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; }
+.macro-dot { width: 0.625rem; height: 0.625rem; border-radius: 2px; flex: none; }
+.m-protein .macro-dot { background: var(--protein); border-radius: 50%; }
+.m-carb .macro-dot { background: var(--carb); }
+.m-fat .macro-dot { background: var(--fat); transform: rotate(45deg); border-radius: 1px; }
+.macro-val { font-size: 0.9375rem; }
+.bar { height: 0.5rem; border-radius: 999px; background: var(--tonal); overflow: hidden; margin-top: 0.375rem; }
+.bar > span { display: block; height: 100%; border-radius: 999px; transition: width 220ms ease-out; }
+.water { gap: 0.625rem; }
+.water-top { display: flex; justify-content: space-between; align-items: center; }
+.water-h { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.0625rem; margin: 0; color: var(--ink); }
+.water-h svg { color: var(--water); }
+.water-btns { align-items: center; }
+.more-nutr > summary { cursor: pointer; font-weight: 600; min-height: 2.75rem; display: flex; align-items: center; color: var(--forest); }
+@media (prefers-reduced-motion: reduce) { .ring-arc, .bar > span { transition: none; } }
+
+/* Meal camera */
+.camera { position: fixed; inset: 0; background: #000; color: #fff; display: flex; flex-direction: column; justify-content: space-between; z-index: 90; }
+.cam-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cam-top, .cam-bottom { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: calc(0.75rem + var(--safe-t)) 1rem 0.75rem; background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0)); }
+.cam-bottom { padding: 1.25rem 1.5rem calc(1.5rem + var(--safe-b)); background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6)); }
+.cam-round { width: 3rem; height: 3rem; border-radius: 50%; border: 0; background: rgba(255,255,255,0.18); color: #fff; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+.cam-pill { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.875rem; border-radius: 999px; border: 0; background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
+.cam-note { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; opacity: 0.9; }
+.cam-frame { position: absolute; left: 10%; right: 10%; top: 22%; bottom: 28%; border: 2px solid rgba(255,255,255,0.75); border-radius: 1.5rem; pointer-events: none; }
+.cam-err { position: relative; margin: 0 1.5rem; padding: 0.875rem; border-radius: 0.75rem; background: rgba(0,0,0,0.65); text-align: center; }
+.shutter { width: 4.5rem; height: 4.5rem; border-radius: 50%; border: 4px solid #fff; background: transparent; padding: 0.25rem; }
+.shutter span { display: block; width: 100%; height: 100%; border-radius: 50%; background: #fff; }
+.shutter:active span { transform: scale(0.92); }
+.shutter:disabled { opacity: 0.5; }
+.cam-spacer { width: 3rem; }
+.cam-lib input { position: absolute; inset: 0; opacity: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.375rem; }

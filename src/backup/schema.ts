@@ -1,7 +1,7 @@
 // Shape and bounds validation for records read from a backup file. Pure functions, no DB access.
 // Unknown extra fields are tolerated (forward compatibility) but every known field is checked,
 // and the generic tree walk rejects prototype-pollution keys, deep nesting and huge strings.
-import type { Food, MealEntry, Recipe, Settings } from '../domain/types';
+import type { Food, MealEntry, Recipe, Settings, WaterLog } from '../domain/types';
 import { NUTRIENT_CODES } from '../domain/types';
 
 export const LIMITS = {
@@ -284,6 +284,17 @@ export function checkSettings(e: Errs, p: string, v: unknown): v is Partial<Sett
   bool(e, `${p}.onlineLookup`, v.onlineLookup, true);
   bool(e, `${p}.keepPhotos`, v.keepPhotos, true);
   bool(e, `${p}.photoSuggestions`, v.photoSuggestions, true);
+  if (v.goals !== undefined) {
+    const g = v.goals;
+    if (!isObj(g)) e.push(`${p}.goals: expected goals.`);
+    else {
+      num(e, `${p}.goals.energy_kcal`, g.energy_kcal, 1, 20000, { optional: true, nullable: true });
+      num(e, `${p}.goals.protein_g`, g.protein_g, 1, 1000, { optional: true, nullable: true });
+      num(e, `${p}.goals.carb_g`, g.carb_g, 1, 2000, { optional: true, nullable: true });
+      num(e, `${p}.goals.fat_g`, g.fat_g, 1, 1000, { optional: true, nullable: true });
+      num(e, `${p}.goals.water_ml`, g.water_ml, 1, 20000, { optional: true, nullable: true });
+    }
+  }
   oneOf(e, `${p}.theme`, v.theme, ['system', 'light', 'dark'], true);
   iso(e, `${p}.lastBackupAt`, v.lastBackupAt, true);
   bool(e, `${p}.onboarded`, v.onboarded, true);
@@ -297,5 +308,29 @@ export function checkFavorites(e: Errs, p: string, v: unknown): v is string[] {
     return false;
   }
   v.forEach((id, i) => str(e, `${p}[${i}]`, id, 128, { re: ID_RE }));
+  return e.list.length === before;
+}
+
+export const MAX_WATER_LOGS = 50_000;
+
+export function checkWater(e: Errs, p: string, v: unknown): v is WaterLog[] {
+  const before = e.list.length;
+  if (!Array.isArray(v) || v.length > MAX_WATER_LOGS) {
+    e.push(`${p}: expected a list of drinks.`);
+    return false;
+  }
+  const seen = new Set<string>();
+  v.forEach((w, i) => {
+    const q = `${p}[${i}]`;
+    if (!isObj(w)) return e.push(`${q}: expected a drink record.`);
+    str(e, `${q}.id`, w.id, 128, { re: ID_RE });
+    if (typeof w.id === 'string') {
+      if (seen.has(w.id)) e.push(`${q}: duplicate id.`);
+      seen.add(w.id);
+    }
+    localDate(e, `${q}.localDate`, w.localDate);
+    num(e, `${q}.ml`, w.ml, 0, 5000, { gtMin: true });
+    iso(e, `${q}.at`, w.at);
+  });
   return e.list.length === before;
 }

@@ -19,7 +19,7 @@ test('log a custom food and keep it offline', async ({ page, context }) => {
   await page.getByRole('textbox', { name: 'Amount', exact: true }).fill('120');
   await expect(page.getByText('Fibre')).toBeVisible();
   await page.screenshot({ path: 'test-results/shots/portion.png', fullPage: true });
-  await page.getByRole('button', { name: /^Add to (Breakfast|Lunch|Dinner|Snacks)$/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Add to (Breakfast|Lunch|Dinner|Snacks)$/ }).click();
 
   await expect(page.getByText('Amma ka dosa batter').first()).toBeVisible();
   // 150 kcal/100 g × 120 g = 180 kcal

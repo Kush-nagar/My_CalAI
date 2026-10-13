@@ -1,5 +1,5 @@
 import { scaleNutrients } from './nutrition';
-import type { Food, MealEntry, MealSlot, PortionSnapshot } from './types';
+import { NUTRIENT_CODES, type Food, type MealEntry, type MealSlot, type NutrientMap, type PortionSnapshot } from './types';
 
 export interface UnitOption {
   unit: string;
@@ -89,4 +89,44 @@ export function editEntryPortion(entry: MealEntry, portion: PortionSnapshot, now
     nutrients: scaleNutrients(entry.per100g, portion.grams),
     updatedAt: now.toISOString(),
   };
+}
+
+/**
+ * Quick add: log calories/macros directly (restaurant meal, label in hand, anything not in the
+ * catalog). Blank values stay unknown. Stored as one "entry" unit with no weight; the snapshot
+ * is per-entry, so editing the quantity scales it.
+ */
+export function buildQuickEntry(args: {
+  name: string;
+  values: Partial<Record<'energy_kcal' | 'protein_g' | 'carb_g' | 'fat_g', number | null>>;
+  meal: MealSlot;
+  localDate: string;
+  now?: Date;
+}): MealEntry {
+  const name = args.name.trim() || 'Quick add';
+  if (name.length > 200) throw new Error('Name is too long');
+  const per100g: NutrientMap = {};
+  let any = false;
+  for (const code of NUTRIENT_CODES) {
+    const v = (args.values as Record<string, number | null | undefined>)[code];
+    if (typeof v === 'number') {
+      if (!(v >= 0 && v < 100000)) throw new RangeError('Values must be between 0 and 100000');
+      per100g[code] = { amount: v, kind: 'user' };
+      any = true;
+    } else per100g[code] = { amount: null, kind: 'user', missingReason: 'Not entered' };
+  }
+  if (!any) throw new Error('Enter at least one value');
+  const food: Food = {
+    id: newId('quick:'),
+    name,
+    aliases: [],
+    state: 'unknown',
+    tags: ['quick-add'],
+    source: { kind: 'user', name: 'Quick add (entered by you)' },
+    per100g,
+    servings: [{ label: '1 entry', grams: 100, evidence: 'Quick add: values entered for the whole entry', source: 'user_calibrated' }],
+    portionMode: 'servings_only',
+    revision: 1,
+  };
+  return buildEntry({ food, portion: makePortion(food, 1, '1 entry'), meal: args.meal, localDate: args.localDate, now: args.now });
 }

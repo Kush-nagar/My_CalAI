@@ -180,6 +180,28 @@ export interface ImageAsset {
 
 export type AgeBand = 'unset' | 'under18' | 'adult';
 
+/**
+ * Daily reference amounts the user chose. null = no goal (the UI then shows amounts only).
+ * Energy and macro goals are never offered in under-18 mode.
+ */
+export interface Goals {
+  energy_kcal: number | null;
+  protein_g: number | null;
+  carb_g: number | null;
+  fat_g: number | null;
+  water_ml: number | null;
+}
+
+export const DEFAULT_GOALS: Goals = { energy_kcal: null, protein_g: null, carb_g: null, fat_g: null, water_ml: 2000 };
+
+/** One drink of water, stored in kv "water" as a list. */
+export interface WaterLog {
+  id: string;
+  localDate: string;
+  ml: number;
+  at: string; // ISO instant
+}
+
 export interface Settings {
   ageBand: AgeBand;
   /** Calories hidden everywhere when false. Forced false-able; under18 defaults hidden. */
@@ -192,6 +214,7 @@ export interface Settings {
   keepPhotos: boolean;
   /** User opted in to on-device photo food-name suggestions (model downloaded on request). */
   photoSuggestions: boolean;
+  goals: Goals;
   theme: 'system' | 'light' | 'dark';
   lastBackupAt?: string;
   onboarded: boolean;
@@ -204,6 +227,7 @@ export const DEFAULT_SETTINGS: Settings = {
   onlineLookup: false,
   keepPhotos: false,
   photoSuggestions: false,
+  goals: DEFAULT_GOALS,
   theme: 'system',
   onboarded: false,
 };

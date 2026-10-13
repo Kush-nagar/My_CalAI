@@ -38,7 +38,12 @@ export interface SearchHit<T = Food> {
 interface Indexed<T> {
   item: T;
   names: { norm: string; skel: string; raw: string }[];
+  /** Added to every match score; lets curated and personal items outrank bulk catalog rows. */
+  bias: number;
 }
+
+/** Bulk USDA rows (tag "usda-global") rank just below curated/personal records with the same match. */
+export const defaultBias = (item: Pick<Food, 'tags'>) => (item.tags.includes('usda-global') ? -4 : 0);
 
 export class SearchIndex<T extends Pick<Food, 'name' | 'aliases' | 'tags'>> {
   private rows: Indexed<T>[] = [];
@@ -51,6 +56,7 @@ export class SearchIndex<T extends Pick<Food, 'name' | 'aliases' | 'tags'>> {
     this.rows = items.map((item) => ({
       item,
       names: [item.name, ...item.aliases].map((raw) => ({ raw, norm: normalize(raw), skel: skeleton(raw) })),
+      bias: defaultBias(item),
     }));
   }
 
@@ -83,7 +89,7 @@ export class SearchIndex<T extends Pick<Food, 'name' | 'aliases' | 'tags'>> {
         best = 15;
         matched = q;
       }
-      if (best > 0) hits.push({ item: row.item, score: best, matched });
+      if (best > 0) hits.push({ item: row.item, score: best + row.bias, matched });
     }
     hits.sort((a, b) => b.score - a.score || a.item.name.length - b.item.name.length || a.item.name.localeCompare(b.item.name));
     return hits.slice(0, limit);

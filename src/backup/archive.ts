@@ -1,10 +1,10 @@
 // Backup archive: export → validate (staged, no DB access) → commit (one atomic transaction).
 // Format: one JSON document, optionally wrapped in a WebCrypto AES-GCM envelope (see crypto.ts).
 import { SCHEMA_VERSION, type Ledger } from '../db/db';
-import type { Food, ImageAsset, MealEntry, Recipe, Settings } from '../domain/types';
+import type { Food, ImageAsset, MealEntry, Recipe, Settings, WaterLog } from '../domain/types';
 import { base64ToBytes, bytesToBase64, sameDigest, sha256Hex, sniffMatches } from './codec';
 import { checkEnvelope, decryptEnvelope, encryptBytes, ENCRYPTED_FORMAT, WrongPassphraseError, type EncryptedEnvelope } from './crypto';
-import { checkEntry, checkFavorites, checkFood, checkRecipe, checkSettings, Errs, ID_RE, walkTree } from './schema';
+import { checkEntry, checkFavorites, checkFood, checkRecipe, checkSettings, checkWater, Errs, ID_RE, walkTree } from './schema';
 
 export const BACKUP_FORMAT = 'thali-backup';
 export const BACKUP_FORMAT_VERSION = 1;
@@ -33,7 +33,8 @@ interface ArchiveData {
   entries: MealEntry[];
   foods: Food[];
   recipes: Recipe[];
-  kv: { settings: Partial<Settings> | null; favorites: string[] | null };
+  /** water is absent in backups made before water tracking existed. */
+  kv: { settings: Partial<Settings> | null; favorites: string[] | null; water?: WaterLog[] | null };
 }
 
 export interface BackupArchive {
@@ -71,16 +72,17 @@ const imageIndex = (imgs: ArchiveImage[]) => imgs.map(({ id, mime, createdAt, sh
 async function readAll(db: Ledger, includePhotos: boolean) {
   // One read transaction = consistent snapshot. Blob bytes are read after it completes.
   const tx = db.transaction(['entries', 'foods', 'recipes', 'images', 'kv'], 'readonly');
-  const [entries, foods, recipes, images, settings, favorites] = await Promise.all([
+  const [entries, foods, recipes, images, settings, favorites, water] = await Promise.all([
     tx.objectStore('entries').getAll(),
     tx.objectStore('foods').getAll(),
     tx.objectStore('recipes').getAll(),
     includePhotos ? tx.objectStore('images').getAll() : Promise.resolve([] as ImageAsset[]),
     tx.objectStore('kv').get('settings'),
     tx.objectStore('kv').get('favorites'),
+    tx.objectStore('kv').get('water'),
   ]);
   await tx.done;
-  return { entries, foods, recipes, images, settings, favorites };
+  return { entries, foods, recipes, images, settings, favorites, water };
 }
 
 /** Build a backup file. Never sends anything anywhere; the caller decides where it goes. */
@@ -109,6 +111,7 @@ export async function exportArchive(db: Ledger, opts: ExportOptions): Promise<Bl
     kv: {
       settings: (raw.settings as Partial<Settings> | undefined) ?? null,
       favorites: (raw.favorites as string[] | undefined) ?? null,
+      water: (raw.water as WaterLog[] | undefined) ?? null,
     },
   };
   const archive: BackupArchive = {
@@ -147,6 +150,7 @@ export interface StagedRestore {
   readonly recipes: Recipe[];
   readonly settings: Partial<Settings> | null;
   readonly favorites: string[] | null;
+  readonly water: WaterLog[] | null;
   readonly images: ImageAsset[];
 }
 
@@ -280,6 +284,7 @@ export async function validateArchive(file: Blob, passphrase?: string): Promise<
   recipes.forEach((r, i) => checkRecipe(e, `recipes[${i}]`, r));
   if (kv.settings !== null) checkSettings(e, 'settings', kv.settings);
   if (kv.favorites !== null) checkFavorites(e, 'favorites', kv.favorites);
+  if (kv.water !== undefined && kv.water !== null) checkWater(e, 'water', kv.water);
   dupCheck(entries, 'diary entry');
   dupCheck(foods, 'food');
   dupCheck(recipes, 'recipe');
@@ -326,6 +331,7 @@ export async function validateArchive(file: Blob, passphrase?: string): Promise<
     recipes: recipes as Recipe[],
     settings,
     favorites: (kv.favorites as string[] | null) ?? null,
+    water: (kv.water as WaterLog[] | null | undefined) ?? null,
     images: assets,
   };
   validated.add(staged);
@@ -425,13 +431,14 @@ export async function commitRestore(
     const kv = tx.objectStore('kv');
 
     if (mode === 'replace') {
-      ops.push(entries.clear(), foods.clear(), recipes.clear(), images.clear(), kv.delete('settings'), kv.delete('favorites'));
+      ops.push(entries.clear(), foods.clear(), recipes.clear(), images.clear(), kv.delete('settings'), kv.delete('favorites'), kv.delete('water'));
       for (const r of staged.entries) ops.push(entries.put(r));
       for (const r of staged.foods) ops.push(foods.put(r));
       for (const r of staged.recipes) ops.push(recipes.put(r));
       for (const r of staged.images) ops.push(images.put(r));
       if (staged.settings) ops.push(kv.put(staged.settings, 'settings'));
       if (staged.favorites) ops.push(kv.put(staged.favorites, 'favorites'));
+      if (staged.water) ops.push(kv.put(staged.water, 'water'));
       Object.assign(added, { entries: staged.entries.length, foods: staged.foods.length, recipes: staged.recipes.length, images: staged.images.length });
     } else {
       const [eKeys, fKeys, rKeys, iKeys, curSettings, curFavs] = await Promise.all([
@@ -442,6 +449,7 @@ export async function commitRestore(
         kv.get('settings'),
         kv.get('favorites'),
       ]);
+      const curWater = ((await kv.get('water')) as WaterLog[] | undefined) ?? [];
       const addNew = <T extends { id: string }>(
         list: readonly T[],
         have: string[],
@@ -467,6 +475,11 @@ export async function commitRestore(
         const cur = Array.isArray(curFavs) ? (curFavs as string[]) : [];
         const union = [...cur, ...staged.favorites.filter((f) => !cur.includes(f))];
         if (union.length !== cur.length) ops.push(kv.put(union, 'favorites'));
+      }
+      if (staged.water) {
+        const have = new Set(curWater.map((w) => w.id));
+        const extra = staged.water.filter((w) => !have.has(w.id));
+        if (extra.length) ops.push(kv.put([...curWater, ...extra], 'water'));
       }
     }
     await Promise.all(ops);

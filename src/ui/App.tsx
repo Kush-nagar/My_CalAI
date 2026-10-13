@@ -5,7 +5,7 @@ import { localDateOf } from '../domain/portion';
 import type { MealSlot, Settings as SettingsT } from '../domain/types';
 import { Icon, type IconName } from './icons';
 import { defaultMeal } from './helpers';
-import { navigate, TABS, UiCtx, useRoute, type Tab, type UiApi } from './ui';
+import { navigate, TABS, UiCtx, useRoute, type AddMode, type Tab, type UiApi } from './ui';
 import { Today } from './screens/Today';
 import { Foods } from './screens/Foods';
 import { Trends } from './screens/Trends';
@@ -82,7 +82,7 @@ function Shell() {
   const tab: Tab = (TABS as readonly string[]).includes(path[0]) ? (path[0] as Tab) : 'today';
   const [date, setDate] = useState(() => localDateOf(new Date()));
   const [version, setVersion] = useState(0);
-  const [add, setAdd] = useState<{ meal: MealSlot } | null>(null);
+  const [add, setAdd] = useState<{ meal: MealSlot; mode: AddMode } | null>(null);
   const [msg, setMsg] = useState('');
   const timer = useRef<number>();
   const mainRef = useRef<HTMLElement>(null);
@@ -122,7 +122,7 @@ function Shell() {
       version,
       bump: () => setVersion((v) => v + 1),
       announce,
-      openAdd: (o) => setAdd({ meal: o?.meal ?? defaultMeal() }),
+      openAdd: (o) => setAdd({ meal: o?.meal ?? defaultMeal(), mode: o?.mode ?? 'search' }),
     }),
     [date, version, announce],
   );
@@ -175,7 +175,7 @@ function Shell() {
       <div class="sr-only" role="status" aria-live="polite">{msg}</div>
       {msg ? <div class="toast" aria-hidden="true"><Icon name="check" size={18} /> {msg}</div> : null}
 
-      {add ? <AddFlow initialMeal={add.meal} onClose={() => setAdd(null)} /> : null}
+      {add ? <AddFlow initialMeal={add.meal} initialMode={add.mode} onClose={() => setAdd(null)} /> : null}
     </UiCtx.Provider>
   );
 }
