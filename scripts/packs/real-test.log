@@ -1,0 +1,24 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/home/runner/work/My_CalAI/My_CalAI[39m
+
+[90mstdout[2m | src/packs/real.test.ts[2m > [22m[2mreal food packs[2m > [22m[2mbuilds, searches and resolves barcodes on the full data
+[22m[39mrows 682846, build 4622 ms, heap +524 MB
+cheerios                 27.2 ms  Cheerios — Nestlé | Cheerios — Nestlé | Cheerios | Cheerios Bio — Nestlé | Cheerios Bio — Nestlé
+chobani greek yogurt     29.3 ms  Chobani, Greek Yogurt, Raspberry & Dark Chocolate, | Greek Yogurt — Chobani | Greek Yogurt — Chobani | Greek Yogurt — Chobani | Greek Yogurt — Chobani
+protein bar              41.5 ms  Protein bar | Protein bar | Protein Bar | Protein Bar | Protein Bar
+coca cola                25.3 ms  coca cola | coca cola — Coke | Coca cola | Coca Cola | Coca Cola — Coke
+amul butter              17.2 ms  Amul butter scotch ice cream | Butter School Pack — Amul | Butter School Pack — Amul | Protein Buttermilk — Amul | Protein Buttermilk — Amul
+maggi noodles            30.0 ms  Maggi Noodles Curry | Maggi noodles masala — Nestle | Maggi noodles masala — Nestle | Maggi Noodles Chicken 5 Pack — Nestlé | Beef noodles — Maggi
+nutella                  29.5 ms  Nutella | nutella — Ferrero | Nutella | nutella — Ferrero | nutella
+oreo                     29.0 ms  oreo | oreo | oreo | Oreo | Oreo
+quest bar                 2.9 ms  Apple Pie — Quest Bar | Protein Bar, Rocky Road — Quest | Quest Protein Cookie bar | Cookies & Cream Protein Bar — Quest | Cookies & Cream Protein Bar — Quest
+fairlife milk            25.4 ms  Fairlife Milk, Ultra- Filtered | Fairlife Milk Ultra- Filtered Reduced Fat Chocolat | ultrafiltered WHOLE MILK — fairlife | Partially Skimmed Chocolate Milk — fairlife | 2% Reduced Fat Ultra-Filtered Milk — Fairlife
+
+ [32m✓[39m src/packs/real.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 4913[2mms[22m[39m
+   [33m[2m✓[22m[39m real food packs[2m > [22mbuilds, searches and resolves barcodes on the full data [33m 4912[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 19:17:38
+[2m   Duration [22m 5.27s[2m (transform 80ms, setup 0ms, collect 83ms, tests 4.91s, environment 1ms, prepare 81ms)[22m
+

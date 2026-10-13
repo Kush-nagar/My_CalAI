@@ -1,0 +1,2 @@
+gtin	name	brand	kcal	protein	carb	fat	fiber	sugars	satfat	sodium_mg	basis	serving_qty	serving_label	ref
+8901058004922	(MAGGI) Rich Tomato Sauce 485Gram	Maggi	140	0	33.4	0	1.4	32		1028	g	25	1 portion (25 g)	off:8901058004922

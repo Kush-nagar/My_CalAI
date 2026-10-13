@@ -1,0 +1,11 @@
+gtin	name	brand	kcal	protein	carb	fat	fiber	sugars	satfat	sodium_mg	basis	serving_qty	serving_label	ref
+8000300137965	18 marrons glacés	Nestlé	325	0.8	76	0.8	4.8	56	0.1	20.02	g			off:8000300137965
+8715600236521	7up free		1	0	0	0		0	0	16	g			off:8715600236521
+4002971083408	Almighurt Bubbles - Passionfruit Plop	Almighurt	89	2.9	13	2.8		12	1.8	40	g	150	150 g	off:4002971083408
+3254474018369	Asperges vertes mini	Géant vert	20	1.9	1.7	0.3	1.5	1	0.1	312	g			off:3254474018369
+3256226395438	Barres de céréales saveur chocolat sans gluten boîte de 138g	U	396	6.7	71	8.6	3.9	24	3.3	208	g	23	23 g	off:3256226395438
+4025500102203	Bianco Zero %	müller	71	5.6	11.8	0.1	1.418	11.8	0.1	72	g	500	500g	off:4025500102203
+0660989030698	Biscuits cacao noisette	Qilibri	484	28	38	24	3.7	19	11	364	g	37.5	37.5 g	off:0660989030698
+20057374	Bouchées de chocolat noir cœur saveur cerise	J. D. Gross	472	5.3	48	28	8.512	42	17	28	g			off:20057374
+0613668024853	Bulliard's Louisiana Supreme Hot Sauce	Bulliard's Louisiana Supreme	25	2.5	1.8	0.6	0	0.3	0.1	3360	g			off:0613668024853
+3380380087707	Cappelletti lentilles corail	Priméal	300	9.5	54	3.7		3.1	0.7	440	g			off:3380380087707
