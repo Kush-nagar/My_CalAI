@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import v8 from 'node:v8';
+import { runInNewContext } from 'node:vm';
 import { PackIndex, rowToFood } from './format';
 
 // Runs only where real packs were built (CI "Food packs check"); skipped in normal test runs.
@@ -7,7 +9,9 @@ const dirs = ['usda-branded', 'off-india', 'off-world'].filter((d) => existsSync
 
 describe.skipIf(!dirs.length)('real food packs', () => {
   it('builds, searches and resolves barcodes on the full data', () => {
-    const gc = (globalThis as { gc?: () => void }).gc;
+    // Force GC around the measurement so heap numbers are real, not pending garbage.
+    v8.setFlagsFromString('--expose-gc');
+    const gc = runInNewContext('gc') as (() => void) | undefined;
     gc?.();
     const mem0 = process.memoryUsage().heapUsed;
     let t = performance.now();
