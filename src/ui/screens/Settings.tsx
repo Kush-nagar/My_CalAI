@@ -8,6 +8,7 @@ import { useUi } from '../ui';
 import { BackupPanel } from '../backup/BackupPanel';
 import { ModelPanel } from '../vision/ModelPanel';
 import { GoalsCard } from './GoalsCard';
+import { PacksPanel } from '../packs/PacksPanel';
 
 export function SafetyNote() {
   return (
@@ -130,6 +131,11 @@ export function Settings() {
             ui.announce('All photos deleted');
           }}
         />
+      </section>
+
+      <section class="card" aria-labelledby="s-packs">
+        <h2 id="s-packs">Food databases</h2>
+        <PacksPanel />
       </section>
 
       <section class="card" aria-labelledby="s-photo">

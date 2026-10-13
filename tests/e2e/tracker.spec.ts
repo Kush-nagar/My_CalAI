@@ -36,7 +36,7 @@ test('goals, quick add, macro bars, water and worldwide search', async ({ page }
   await page.getByRole('textbox', { name: 'What did you have? (optional)' }).fill('Protein banana smoothie');
   await page.getByRole('textbox', { name: 'Calories' }).fill('320');
   await page.getByRole('textbox', { name: 'Protein' }).fill('28');
-  await page.getByRole('dialog').getByRole('button', { name: /^Add to / }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Add to (Breakfast|Lunch|Dinner|Snacks)$/ }).click();
   await expect(page.getByText('Protein banana smoothie').first()).toBeVisible();
   await expect(page.locator('.ring-num')).toHaveText('1,680');
   await expect(page.getByRole('progressbar', { name: 'Protein 28 of 100 grams' })).toBeVisible();

@@ -455,3 +455,4 @@ details.block > summary { font-weight: 600; min-height: 2.75rem; display: flex; 
 .cam-spacer { width: 3rem; }
 .cam-lib input { position: absolute; inset: 0; opacity: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.list-h { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--secondary); margin: 1rem 0 0.375rem; }

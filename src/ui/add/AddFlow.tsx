@@ -14,6 +14,7 @@ import { CustomFoodForm } from '../screens/CustomFoodForm';
 import { FoodRow } from './FoodRow';
 import { PortionView } from './PortionView';
 import { QuickAdd } from './QuickAdd';
+import { installedPacks, searchPacks } from '../../packs/client';
 import { CameraCapture } from '../vision/CameraCapture';
 import type { Candidate } from '../../vision/match';
 import { ModelPanel } from '../vision/ModelPanel';
@@ -104,6 +105,20 @@ export function AddFlow(props: { initialMeal: MealSlot; initialMode?: AddMode; o
     return () => clearTimeout(t);
   }, [query]);
   const hits = useMemo(() => (q.trim() ? state.index.search(q, 40) : []), [q, state.index]);
+  // Installed offline food databases (branded/packaged products), searched in a worker.
+  const [packHits, setPackHits] = useState<Food[]>([]);
+  const [hasPacks, setHasPacks] = useState<boolean | null>(null);
+  useEffect(() => {
+    installedPacks(state.db).then((p) => setHasPacks(p.length > 0), () => setHasPacks(false));
+  }, []);
+  useEffect(() => {
+    let live = true;
+    if (!q.trim() || q.trim().length < 2 || !hasPacks) return setPackHits([]);
+    searchPacks(state.db, q, 30).then((r) => live && setPackHits(r), () => live && setPackHits([]));
+    return () => {
+      live = false;
+    };
+  }, [q, hasPacks]);
   const pick = (food: Food) => setStep({ kind: 'portion', food });
 
   async function relog(e: MealEntry) {
@@ -270,7 +285,23 @@ export function AddFlow(props: { initialMeal: MealSlot; initialMode?: AddMode; o
                   ))}
                 </ul>
               ) : null}
-              {query.trim() && !hits.length ? (
+              {packHits.length ? (
+                <>
+                  <h3 class="list-h">Packaged &amp; branded</h3>
+                  <ul class="list" aria-label={`${packHits.length} packaged products`}>
+                    {packHits.map((f) => (
+                      <FoodRow key={f.id} food={f} showKcal={showKcal} onClick={() => pick(f)} />
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+              {query.trim() && hasPacks === false ? (
+                <p class="hint pad">
+                  Looking for a packaged brand? Add the branded food databases in{' '}
+                  <button type="button" class="link" onClick={() => { props.onClose(); navigate('settings'); }}>Settings › Food databases</button>.
+                </p>
+              ) : null}
+              {query.trim() && !hits.length && !packHits.length ? (
                 <div class="nomatch" role="status">
                   <p><strong>No match for “{query.trim()}”.</strong> Nothing is guessed. You can add it yourself.</p>
                   <div class="btn-row">

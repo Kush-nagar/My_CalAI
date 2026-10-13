@@ -34,6 +34,15 @@ try {
     url: 'https://world.openfoodfacts.org/', outDir: 'public/packs/off-india',
   }));
   stats.offIndia = rows.length;
+  rmSync('public/packs/off-world', { recursive: true, force: true });
+  packs.push(writePack({
+    id: 'off-world', name: 'Open Food Facts — popular products worldwide', version: new Date().toISOString().slice(0, 10), rows: byCountry.world,
+    description: 'The most-scanned packaged foods from around the world (UK, Europe, Canada, Australia, the Middle East and more), contributed by the Open Food Facts community. Quality varies: check against the label.',
+    source: 'Open Food Facts', license: 'Open Database License (ODbL) 1.0; database contents under the Database Contents License',
+    attribution: '© Open Food Facts contributors (openfoodfacts.org). This derived database is made available under the ODbL.',
+    url: 'https://world.openfoodfacts.org/', outDir: 'public/packs/off-world',
+  }));
+  stats.offWorld = byCountry.world.length;
 } catch (e) { console.error('Open Food Facts pack failed:', e.message); stats.offError = e.message; }
 
 mkdirSync('public/packs', { recursive: true });

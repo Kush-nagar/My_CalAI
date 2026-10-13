@@ -7,18 +7,25 @@ import { eachRow, plausible } from './lib.mjs';
 
 const URL_CSV = 'https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz';
 
-export async function buildOff(work, countries) {
+/**
+ * One pass over the Open Food Facts export. Returns per-country packs plus a "world" pack of the
+ * most-scanned products (excluding US-only items, which USDA Branded already covers).
+ */
+export async function buildOff(work, countries, worldLimit = 250_000) {
   mkdirSync(work, { recursive: true });
   const gz = join(work, 'off-products.csv.gz');
   if (!existsSync(gz)) execFileSync('curl', ['-fsSL', '--retry', '6', '--retry-all-errors', '--retry-delay', '10', '-o', gz, URL_CSV]);
   const want = countries.map((c) => c.toLowerCase());
   const out = new Map(want.map((c) => [c, new Map()]));
   let total = 0;
+  const world = [];
   await eachRow(gz, (r) => {
     total++;
-    const cs = (r.countries_en || '').toLowerCase().split(',').map((s) => s.trim());
+    const cs = (r.countries_en || '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
     const hits = want.filter((c) => cs.includes(c));
-    if (!hits.length) return;
+    const scans = Number(r.unique_scans_n) || 0;
+    const usOnly = cs.length === 1 && cs[0] === 'united states';
+    if (!hits.length && (scans < 2 || usOnly)) return;
     const kcal = r['energy-kcal_100g'] !== '' ? r['energy-kcal_100g'] : r['energy_100g'] ? Number(r['energy_100g']) / 4.184 : '';
     const sodiumG = r.sodium_100g;
     const rec = {
@@ -30,12 +37,24 @@ export async function buildOff(work, countries) {
       date: r.last_modified_t || '',
     };
     if (!rec.name || !/^\d{6,14}$/.test(r.code || '') || !plausible(rec)) return;
+    if (scans >= 2 && !usOnly) world.push([scans, rec]);
     for (const c of hits) {
       const m = out.get(c);
       const cur = m.get(r.code);
       if (!cur || rec.date > cur.date) m.set(r.code, rec);
     }
   }, { tsv: true, gz: true });
-  console.log('off rows scanned', total);
-  return Object.fromEntries([...out].map(([c, m]) => [c, [...m.values()].sort((a, b) => a.name.localeCompare(b.name))]));
+  console.log('off rows scanned', total, 'world candidates', world.length);
+  world.sort((a, b) => b[0] - a[0]);
+  const seen = new Set();
+  const top = [];
+  for (const [, rec] of world) {
+    if (seen.has(rec.gtin)) continue;
+    seen.add(rec.gtin);
+    top.push(rec);
+    if (top.length >= worldLimit) break;
+  }
+  const result = Object.fromEntries([...out].map(([c, m]) => [c, [...m.values()].sort((a, b) => a.name.localeCompare(b.name))]));
+  result.world = top.sort((a, b) => a.name.localeCompare(b.name));
+  return result;
 }

@@ -29,5 +29,6 @@ jobs:
           for d in public/packs/*/; do id=$(basename "$d"); [ -f "$d/00.txt" ] && awk 'NR==1 || NR%4000==2' "$d/00.txt" | head -12 > "scripts/packs/samples/$id.txt"; done
           git add scripts/packs/last-build.json scripts/packs/samples
           git diff --cached --quiet || git commit -m "packs: build stats"
+          git checkout -- public/packs
           git pull --rebase
           git push

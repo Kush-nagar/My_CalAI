@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { useApp } from '../store';
+import { packBarcode } from '../../packs/client';
 import { putCustomFood } from '../../db/repo';
 import { barcodeCandidates, isValidGtin } from '../../platform/gtin';
 import { lookupOff, OffError, OFF_ATTRIBUTION, OFF_CAVEAT, type OffPreview } from '../../platform/off';
@@ -53,7 +54,7 @@ export function BarcodeSheet({ onFound, onManualEntry, onClose }: Props) {
     };
   }, []);
 
-  /** Resolve a barcode: local custom foods first, never network. */
+  /** Resolve a barcode: your foods first, then installed offline databases; never network. */
   async function handleCode(code: string) {
     stopCamera();
     for (const cand of barcodeCandidates(code)) {
@@ -62,6 +63,11 @@ export function BarcodeSheet({ onFound, onManualEntry, onClose }: Props) {
         onFound(hit);
         return;
       }
+    }
+    const packHit = await packBarcode(state.db, code).catch(() => null);
+    if (packHit) {
+      onFound(packHit);
+      return;
     }
     if (aliveRef.current) setPhase({ t: 'code', code });
   }

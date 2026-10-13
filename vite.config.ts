@@ -34,9 +34,12 @@ function swPrecache(): Plugin {
       // (env.wasm.wasmBinary), so that copy is never fetched: delete it rather than precache 27 MB.
       for (const f of readdirSync(join(outDir, 'assets'))) if (/^ort-wasm-.*\.wasm$/.test(f)) unlinkSync(join(outDir, 'assets', f));
       walk(outDir);
-      // Opt-in model files (models/, ort/) are downloaded only when the user enables photo
+      // Opt-in model files (models/, ort/, packs/) are downloaded only when the user enables photo
       // suggestions, so they must never be precached for everyone.
-      const list = files.filter((f) => f !== 'sw.js' && !f.endsWith('.map') && !/^(models|ort)\//.test(f));
+      // Same for downloadable food packs, except their small manifest (needed to show what's on offer).
+      const list = files.filter(
+        (f) => f !== 'sw.js' && !f.endsWith('.map') && (f === 'packs/manifest.json' || !/^(models|ort|packs)\//.test(f)),
+      );
       const hash = createHash('sha256');
       for (const f of list) hash.update(f).update(readFileSync(join(outDir, f)));
       const version = hash.digest('hex').slice(0, 12);
