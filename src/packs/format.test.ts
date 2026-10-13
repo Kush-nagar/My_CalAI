@@ -78,3 +78,11 @@ describe('food packs', () => {
     expect(performance.now() - t).toBeLessThan(1500);
   });
 });
+
+describe('fold', () => {
+  it('keeps length, removes accents and blanks non-Latin', async () => {
+    const { fold } = await import('./format');
+    for (const s of ['Nestlé Crème', 'İstanbul simit', 'नमकीन Bhujia', 'Pão 🍞 de queijo', 'ÆØÅ ß']) expect(fold(s).length).toBe(s.length);
+    expect(fold('Nestlé Crème')).toBe('nestle creme');
+  });
+});

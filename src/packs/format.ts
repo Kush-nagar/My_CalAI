@@ -48,17 +48,19 @@ interface Shard {
   base: number; // global row index of the first line
 }
 
-/** Length-preserving fold: lowercase + strip common Latin accents, so offsets stay valid. */
-function fold(raw: string): string {
-  let low = raw.toLowerCase();
-  if (low.length !== raw.length) {
-    // Rare characters change length when lowercased: fold them one by one instead.
-    low = Array.from(raw, (c) => (c.toLowerCase().length === c.length ? c.toLowerCase() : c)).join('');
-  }
-  return low.replace(/[\u00C0-\u024F]/g, (c) => {
-    const base = c.normalize('NFKD').replace(/\p{M}/gu, '');
-    return base.length === 1 ? base : c;
-  });
+/**
+ * Length-preserving fold for matching (offsets must stay valid): Latin accents removed, lowercase,
+ * and non-Latin characters blanked (pack search is by Latin-script names; the curated catalog
+ * covers Hindi and regional scripts).
+ */
+export function fold(raw: string): string {
+  return raw
+    .replace(/[^\u0000-\u024F]/g, ' ')
+    .replace(/[\u00C0-\u024F]/g, (c) => {
+      const base = c.normalize('NFKD').replace(/\p{M}/gu, '');
+      return base.length === 1 ? base : ' ';
+    })
+    .toLowerCase();
 }
 
 export class PackIndex {
@@ -66,7 +68,8 @@ export class PackIndex {
   private total = 0;
   private gtinKeys = new Float64Array(0);
   private gtinRows = new Uint32Array(0);
-  private pendingGtins: [number, number][] = [];
+  private pendKeys: number[] = [];
+  private pendRows: number[] = [];
 
   get size() {
     return this.total;
@@ -90,7 +93,10 @@ export class PackIndex {
           starts.push(pos);
           const gt = text.slice(pos, text.indexOf('\t', pos));
           const g = normGtin(gt);
-          if (g && g.length <= 15) this.pendingGtins.push([Number(g), this.total + starts.length - 1]);
+          if (g && g.length <= 15) {
+            this.pendKeys.push(Number(g));
+            this.pendRows.push(this.total + starts.length - 1);
+          }
         }
       }
       pos = end === -1 ? -1 : end + 1;
@@ -101,17 +107,32 @@ export class PackIndex {
   }
 
   build() {
-    const all: [number, number][] = [];
-    for (let i = 0; i < this.gtinKeys.length; i++) all.push([this.gtinKeys[i], this.gtinRows[i]]);
-    for (const x of this.pendingGtins) all.push(x);
-    this.pendingGtins = [];
-    // First occurrence wins for duplicate barcodes across packs.
-    all.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-    const keys: number[] = [];
-    const rows: number[] = [];
-    for (const [k, r] of all) if (keys[keys.length - 1] !== k) { keys.push(k); rows.push(r); }
-    this.gtinKeys = Float64Array.from(keys);
-    this.gtinRows = Uint32Array.from(rows);
+    const n0 = this.gtinKeys.length;
+    const n = n0 + this.pendKeys.length;
+    const k = new Float64Array(n);
+    const r = new Uint32Array(n);
+    k.set(this.gtinKeys);
+    r.set(this.gtinRows);
+    k.set(this.pendKeys, n0);
+    r.set(this.pendRows, n0);
+    this.pendKeys = [];
+    this.pendRows = [];
+    // Sort by barcode; the first occurrence (lowest row) wins for duplicates across packs.
+    const order = new Uint32Array(n);
+    for (let i = 0; i < n; i++) order[i] = i;
+    order.sort((a, b) => k[a] - k[b] || r[a] - r[b]);
+    const keys = new Float64Array(n);
+    const rows = new Uint32Array(n);
+    let m = 0;
+    for (let j = 0; j < n; j++) {
+      const i = order[j];
+      if (m > 0 && keys[m - 1] === k[i]) continue;
+      keys[m] = k[i];
+      rows[m] = r[i];
+      m++;
+    }
+    this.gtinKeys = keys.slice(0, m);
+    this.gtinRows = rows.slice(0, m);
   }
 
   private locate(i: number): { sh: Shard; li: number } {

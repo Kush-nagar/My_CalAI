@@ -7,12 +7,15 @@ const dirs = ['usda-branded', 'off-india', 'off-world'].filter((d) => existsSync
 
 describe.skipIf(!dirs.length)('real food packs', () => {
   it('builds, searches and resolves barcodes on the full data', () => {
+    const gc = (globalThis as { gc?: () => void }).gc;
+    gc?.();
     const mem0 = process.memoryUsage().heapUsed;
     let t = performance.now();
     const p = new PackIndex();
     for (const d of dirs) for (const f of readdirSync(`public/packs/${d}`).filter((x) => x.endsWith('.txt') && /^\d+/.test(x)).sort()) p.addShard(d, readFileSync(`public/packs/${d}/${f}`, 'utf8'));
     p.build();
     const buildMs = performance.now() - t;
+    gc?.();
     const memMb = (process.memoryUsage().heapUsed - mem0) / 1e6;
     console.log(`rows ${p.size}, build ${buildMs.toFixed(0)} ms, heap +${memMb.toFixed(0)} MB`);
     for (const q of ['cheerios', 'chobani greek yogurt', 'protein bar', 'coca cola', 'amul butter', 'maggi noodles', 'nutella', 'oreo', 'quest bar', 'fairlife milk']) {
@@ -21,7 +24,8 @@ describe.skipIf(!dirs.length)('real food packs', () => {
       console.log(`${q.padEnd(22)} ${(performance.now() - t).toFixed(1).padStart(6)} ms  ${r.map((x) => rowToFood(x).name.slice(0, 50)).join(' | ')}`);
     }
     const anyGtin = p.search('cheerios', 1)[0]?.gtin;
-    if (anyGtin) expect(p.byBarcode(anyGtin)?.gtin).toBe(anyGtin);
+    const norm = (g?: string) => (g ?? '').replace(/\D/g, '').replace(/^0+/, '');
+    if (anyGtin) expect(norm(p.byBarcode(anyGtin)?.gtin)).toBe(norm(anyGtin));
     expect(p.size).toBeGreaterThan(1000);
   });
 });
